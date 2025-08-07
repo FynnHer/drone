@@ -51,7 +51,7 @@
     ]
   },
   "modelSettings": {
-    "modelPath": "models/odm_textured_model_geo.glb",
+    "modelPath": "odm_textured_model_geo.glb",
     "modelType": "glb",
     "backgroundColor": "#222222",
     "showHelpers": true

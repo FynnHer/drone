@@ -75,14 +75,14 @@ async function loadProjectsDirectly() {
 // Function to fetch project folders
 async function fetchProjectFolders() {
     // This is a simplified approach - GitHub Pages doesn't allow directory listing
-    // So we'll check for the presence of a few known project folders
-    const knownProjects = ['sample'];
+    // So we'll check for the presence of known project folders
+    const knownProjects = ['sample', 'stettiner-str'];
     
     // Add any subfolders from the projects directory that have been explicitly added
     // This part would normally be generated server-side, but for GitHub Pages we need to hardcode it
     const additionalProjects = [];
     
-    // Add any folder that has an index.html file in the projects directory
+    // Check for additional projects by testing for index.html files
     try {
         // We'll check for 'project-1', 'project-2', etc. to see if they exist
         const possibleProjects = ['project-1', 'project-2', 'coastline-survey', 'urban-mapping', 'forest-survey'];
