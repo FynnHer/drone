@@ -89,6 +89,20 @@
             
             <!-- 3D Model View -->
             <div id="model-view" class="view"></div>
+
+                <div class="under-construction">
+                    <div class="construction-content">
+                        <i class="fas fa-hard-hat" style="font-size: 4rem; color: #f39c12; margin-bottom: 1rem;"></i>
+                        <h2>Under Construction</h2>
+                        <p>The 3D model viewer is currently under development.</p>
+                        <p>Check back later for updates!</p>
+                        <div style="margin-top: 2rem;">
+                            <button id="back-to-map-btn" class="action-button">
+                                <i class="fas fa-map"></i> Back to 2D Map
+                            </button>
+                        </div>
+                    </div>
+                </div>
             
             <!-- Controls overlay -->
             <div class="viewer-controls">
@@ -137,6 +151,13 @@
     <script src="../../assets/js/viewer.js"></script>
     
     <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the viewer when DOM is ready
+            document.getElementById('back-to-map-btn').addEventListener('click', function() {
+                setActiveView('map-view');
+            });
+        });
         // Initialize the project
         function initializeWhenReady() {
             // Try to load metadata from metadata.json
