@@ -18,6 +18,7 @@ class ModelViewer {
         this.controls = null;
         this.model = null;
         this.isInitialized = false;
+        this.dracoLoader = null;
         
         // Initialize if container exists
         if (this.container) {
@@ -124,8 +125,6 @@ class ModelViewer {
         // Show loading indicator
         this.showLoading(true);
         
-        let loader;
-        
         // Check if required loaders are available
         if (type.toLowerCase() === 'obj' && typeof THREE.OBJLoader === 'undefined') {
             this.showLoading(false);
@@ -140,6 +139,9 @@ class ModelViewer {
             return;
         }
         
+        // Setup the appropriate loader
+        let loader;
+        
         switch (type.toLowerCase()) {
             case 'obj':
                 loader = new THREE.OBJLoader();
@@ -148,6 +150,29 @@ class ModelViewer {
             case 'glb':
             default:
                 loader = new THREE.GLTFLoader();
+                
+                // Setup DRACOLoader for compressed models
+                if (typeof THREE.DRACOLoader !== 'undefined') {
+                    try {
+                        // Create and configure the Draco loader
+                        this.dracoLoader = new THREE.DRACOLoader();
+                        
+                        // Set the path to the Draco decoder
+                        this.dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+                        
+                        // Optional: Specify a WebAssembly or JavaScript decoder
+                        this.dracoLoader.setDecoderConfig({ type: 'js' });
+                        
+                        // Attach the loader to the GLTFLoader
+                        loader.setDRACOLoader(this.dracoLoader);
+                        
+                        console.log('DRACOLoader configured successfully');
+                    } catch (error) {
+                        console.error('Error configuring DRACOLoader:', error);
+                    }
+                } else {
+                    console.warn('THREE.DRACOLoader not available. Compressed models may not load correctly.');
+                }
                 break;
         }
         
@@ -352,6 +377,9 @@ class ModelViewer {
                 <button id="retry-load-model" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
                     Retry
                 </button>
+                <button id="load-simple-model" style="margin-top: 1rem; margin-left: 0.5rem; padding: 0.5rem 1rem; background: #2ecc71; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Load Simple Model
+                </button>
             </div>
         `;
         
@@ -363,6 +391,16 @@ class ModelViewer {
                 if (this.options.modelPath) {
                     this.loadModel(this.options.modelPath, this.options.modelType);
                 }
+            });
+        }
+        
+        // Add simple model button functionality
+        const simpleModelButton = errorEl.querySelector('#load-simple-model');
+        if (simpleModelButton) {
+            simpleModelButton.addEventListener('click', () => {
+                errorEl.style.display = 'none';
+                // Load a simple model that doesn't require Draco compression
+                this.loadModel('https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf', 'gltf');
             });
         }
         

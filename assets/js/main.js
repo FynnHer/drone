@@ -38,6 +38,11 @@ async function loadProjectsDirectly() {
         
         // Display each project
         for (const projectFolder of projectFolders) {
+            // Skip sample project unless it's the only one
+            if (projectFolder === 'sample' && projectFolders.length > 1) {
+                continue;
+            }
+            
             try {
                 // Attempt to load metadata from the project folder
                 const metadata = await fetchProjectMetadata(projectFolder);
@@ -47,7 +52,9 @@ async function loadProjectsDirectly() {
                     description: metadata.description || 'No description available.',
                     date: metadata.date,
                     location: metadata.location,
-                    thumbnail: metadata.thumbnail
+                    thumbnail: metadata.thumbnail,
+                    // Use map center to generate a thumbnail if none exists
+                    mapCenter: metadata.mapSettings?.center || null
                 });
                 projectsList.appendChild(projectCard);
             } catch (error) {
@@ -68,7 +75,7 @@ async function loadProjectsDirectly() {
         }
     } catch (error) {
         console.error('Error loading projects:', error);
-        showSampleProjects(projectsList);
+        projectsList.innerHTML = '<div class="no-projects">Error loading projects. Please check the console for details.</div>';
     }
 }
 
@@ -76,7 +83,7 @@ async function loadProjectsDirectly() {
 async function fetchProjectFolders() {
     // This is a simplified approach - GitHub Pages doesn't allow directory listing
     // So we'll check for the presence of known project folders
-    const knownProjects = ['sample', 'stettiner-str'];
+    const knownProjects = ['stettiner-str'];
     
     // Add any subfolders from the projects directory that have been explicitly added
     // This part would normally be generated server-side, but for GitHub Pages we need to hardcode it
@@ -84,7 +91,7 @@ async function fetchProjectFolders() {
     
     // Check for additional projects by testing for index.html files
     try {
-        // We'll check for 'project-1', 'project-2', etc. to see if they exist
+        // We'll check for common project names
         const possibleProjects = ['project-1', 'project-2', 'coastline-survey', 'urban-mapping', 'forest-survey'];
         for (const projectName of possibleProjects) {
             try {
@@ -102,6 +109,11 @@ async function fetchProjectFolders() {
     
     // Combine known and discovered projects
     const allProjects = [...knownProjects, ...additionalProjects];
+    
+    // Add sample project only if no other projects are found
+    if (allProjects.length === 0) {
+        allProjects.push('sample');
+    }
     
     // Deduplicate
     return [...new Set(allProjects)];
@@ -125,11 +137,25 @@ async function fetchProjectMetadata(projectFolder) {
                 const titleMatch = html.match(/<title>(.*?)<\/title>/i);
                 const title = titleMatch ? titleMatch[1] : projectFolder;
                 
+                // Try to extract map center from Leaflet initialization
+                let center = [0, 0];
+                const leafletInitMatch = html.match(/L\.map\(['"]\w+['"]\).*?setView\(\[(.*?)\],\s*(\d+)/s);
+                if (leafletInitMatch) {
+                    try {
+                        center = JSON.parse(`[${leafletInitMatch[1]}]`);
+                    } catch (e) {
+                        console.warn('Failed to parse Leaflet init parameters:', e);
+                    }
+                }
+                
                 // Generate a basic metadata object
                 return {
                     title: title,
                     description: `${title} mapping project`,
-                    date: new Date().toISOString().split('T')[0]
+                    date: new Date().toISOString().split('T')[0],
+                    mapSettings: {
+                        center: center
+                    }
                 };
             }
         } catch (e) {
@@ -146,13 +172,24 @@ function createProjectCard(project) {
     card.className = 'project-card';
     card.setAttribute('data-project-id', project.id);
     
-    const thumbnailStyle = project.thumbnail 
-        ? `background-image: url(${project.thumbnail});` 
+    // Generate thumbnail URL from map center if available
+    let thumbnailUrl = project.thumbnail;
+    if (!thumbnailUrl && project.mapCenter && Array.isArray(project.mapCenter) && project.mapCenter.length === 2) {
+        // Generate a static map thumbnail using OpenStreetMap/MapBox
+        const [lat, lng] = project.mapCenter;
+        thumbnailUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${lng},${lat},14,0/300x180?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw`;
+        
+        // Alternative using OpenStreetMap static map (if MapBox doesn't work)
+        // thumbnailUrl = `https://maps.geoapify.com/v1/staticmap?style=osm-carto&width=300&height=180&center=lonlat:${lng},${lat}&zoom=14&apiKey=5d486ef4a7124b88a24e1f54c24e97c4`;
+    }
+    
+    const thumbnailStyle = thumbnailUrl 
+        ? `background-image: url(${thumbnailUrl});` 
         : 'background-color: #ddd; display: flex; justify-content: center; align-items: center;';
     
     card.innerHTML = `
         <div class="project-image" style="${thumbnailStyle}">
-            ${!project.thumbnail ? '<i class="fas fa-drone" style="font-size: 3rem; color: #aaa;"></i>' : ''}
+            ${!thumbnailUrl ? '<i class="fas fa-drone" style="font-size: 3rem; color: #aaa;"></i>' : ''}
         </div>
         <div class="project-info">
             <h3>${project.title}</h3>
@@ -191,56 +228,6 @@ async function checkFileExists(url) {
     } catch {
         return false;
     }
-}
-
-// Function to show sample projects when no projects are found
-function showSampleProjects(container) {
-    container.innerHTML = '';
-    
-    // Sample projects to demonstrate the UI
-    const sampleProjects = [
-        {
-            id: 'sample',
-            title: 'Forest Survey',
-            description: 'Aerial mapping of northern forest region showing canopy coverage and terrain.',
-            date: '2025-07-15',
-            thumbnail: 'https://via.placeholder.com/300x180?text=Forest+Survey',
-            location: 'Northern Region'
-        },
-        {
-            id: 'sample',
-            title: 'Urban Development Site',
-            description: 'Detailed mapping of construction site with progress tracking.',
-            date: '2025-08-01',
-            thumbnail: 'https://via.placeholder.com/300x180?text=Urban+Development',
-            location: 'Downtown Area'
-        },
-        {
-            id: 'sample',
-            title: 'Coastal Erosion Study',
-            description: 'Monitoring of coastline changes over time with detailed elevation model.',
-            date: '2025-07-23',
-            thumbnail: 'https://via.placeholder.com/300x180?text=Coastal+Mapping',
-            location: 'Eastern Shoreline'
-        }
-    ];
-    
-    sampleProjects.forEach(project => {
-        const projectCard = createProjectCard(project);
-        container.appendChild(projectCard);
-    });
-    
-    // Add note about sample projects
-    const note = document.createElement('div');
-    note.className = 'sample-note';
-    note.style.gridColumn = '1 / -1';
-    note.style.marginTop = '1rem';
-    note.style.padding = '1rem';
-    note.style.backgroundColor = 'var(--card-bg)';
-    note.style.borderRadius = '8px';
-    note.style.textAlign = 'center';
-    note.innerHTML = '<p><i class="fas fa-info-circle"></i> These are sample projects. Add your own projects by creating folders in the "projects" directory.</p>';
-    container.appendChild(note);
 }
 
 // Function to format dates
