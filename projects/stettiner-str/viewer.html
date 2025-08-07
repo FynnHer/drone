@@ -102,11 +102,34 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- Three.js for 3D -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.0/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.0/examples/js/loaders/OBJLoader.js"></script>
+    <!-- Import map to ensure proper module loading -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+        }
+    }
+    </script>
+    
+    <!-- Three.js ESModules for better compatibility with newer features -->
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+        
+        window.THREE = THREE;
+        window.OrbitControls = OrbitControls;
+        window.GLTFLoader = GLTFLoader;
+        window.DRACOLoader = DRACOLoader;
+        
+        // Signal that modules are loaded
+        window.threeModulesLoaded = true;
+        
+        // Dispatch event when loaded
+        window.dispatchEvent(new Event('threeModulesLoaded'));
+    </script>
     
     <!-- Main scripts -->
     <script src="../../assets/js/map-viewer.js"></script>
@@ -115,7 +138,7 @@
     
     <script>
         // Initialize the project
-        document.addEventListener('DOMContentLoaded', function() {
+        function initializeWhenReady() {
             // Try to load metadata from metadata.json
             fetch('./metadata.json')
                 .then(response => {
@@ -148,7 +171,14 @@
                 
             // Set up direct map integration for existing projects
             setupMapIntegration();
-        });
+        }
+        
+        // Wait for Three.js modules to load
+        if (window.threeModulesLoaded) {
+            initializeWhenReady();
+        } else {
+            window.addEventListener('threeModulesLoaded', initializeWhenReady);
+        }
         
         // Set up integration with existing map
         function setupMapIntegration() {

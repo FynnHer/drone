@@ -172,11 +172,20 @@ function createProjectCard(project) {
     card.className = 'project-card';
     card.setAttribute('data-project-id', project.id);
     
-    // Use a reliable default thumbnail image instead of trying to generate one
-    // This avoids issues with API keys and cross-origin restrictions
-    const defaultThumbnail = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTgwIiB2aWV3Qm94PSIwIDAgMzAwIDE4MCIgZmlsbD0ibm9uZSI+CiAgPHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIxODAiIGZpbGw9IiM3MmI2ZGYiLz4KICA8cGF0aCBkPSJNMCwxMjAgTDUwLDEwMCBMMTAwLDEzMCBMMTUwLDkwIEwyMDAsMTEwIEwyNTAsODAgTDMwMCwxMTAgTDMwMCwxODAgTDAsMTgwIFoiIGZpbGw9IiM1MDk0YzkiLz4KICA8Y2lyY2xlIGN4PSIyNDAiIGN5PSI0MCIgcj0iMjAiIGZpbGw9IiNmZmQ3MDAiLz4KICA8cGF0aCBkPSJNMTUwLDE4MCBMMTM1LDE0MCBMMTM4LDEzNSBMMTQwLDEzNSBMMTQ1LDE0MCBMMTU1LDE0MCBMMTY1LDEzNSBMMTY4LDEzNSBMMTcwLDE0MCBMMTYwLDE4MCBaIiBmaWxsPSIjNDQ0Ii8+CiAgPHBhdGggZD0iTTgwLDE4MCBMNjUsMTUwIEw3MCwxNDUgTDc1LDE0NSBMODAsMTUwIEw4NSwxNTAgTDkwLDE0NSBMOTUsMTQ1IEwxMDAsMTUwIEw5MCwxODAgWiIgZmlsbD0iIzQ0NCIvPgo8L3N2Zz4K';
+    // Generate thumbnail based on map center if available
+    let thumbnailUrl = project.thumbnail;
     
-    const thumbnailUrl = project.thumbnail || defaultThumbnail;
+    if (!thumbnailUrl && project.mapCenter && Array.isArray(project.mapCenter) && project.mapCenter.length === 2) {
+        // Use OpenStreetMap static map API (no API key required)
+        const [lat, lng] = project.mapCenter;
+        const zoom = 14;
+        thumbnailUrl = `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=${zoom}&size=300x180&maptype=mapnik`;
+    }
+    
+    // Fallback to a map-like image if no thumbnail or coordinates available
+    if (!thumbnailUrl) {
+        thumbnailUrl = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTgwIiB2aWV3Qm94PSIwIDAgMzAwIDE4MCIgZmlsbD0ibm9uZSI+CiAgPHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIxODAiIGZpbGw9IiNlZWVlZWUiLz4KICA8cGF0aCBkPSJNMCwwIEwzMDAsMCBMMzAwLDE4MCBMMCwxODAgWiIgZmlsbD0iI2YyZjJmMiIvPgogIDxwYXRoIGQ9Ik01MCwyMCBMNTAsMTYwIiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxwYXRoIGQ9Ik0xMDAsMjAgTDEwMCwxNjAiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHBhdGggZD0iTTE1MCwyMCBMMTUwLDE2MCIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cGF0aCBkPSJNMjAwLDIwIEwyMDAsMTYwIiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxwYXRoIGQ9Ik0yNTAsMjAgTDI1MCwxNjAiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHBhdGggZD0iTTIwLDUwIEwyODAsNTAiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHBhdGggZD0iTTIwLDgwIEwyODAsODAiIHN0cm9rZT0iI2NjY2NjYyIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHBhdGggZD0iTTIwLDExMCBMMjgwLDExMCIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cGF0aCBkPSJNMjAsMTQwIEwyODAsMTQwIiBzdHJva2U9IiNjY2NjY2MiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxjaXJjbGUgY3g9IjE1MCIgY3k9IjkwIiByPSIxNSIgZmlsbD0iIzU1YWFmZiIgc3Ryb2tlPSIjMjI4MGNjIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIxNTAiIHk9IjE3MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjNTU1Ij5NYXAgUHJldmlldyBOb3QgQXZhaWxhYmxlPC90ZXh0Pgo8L3N2Zz4K';
+    }
     
     card.innerHTML = `
         <div class="project-image" style="background-image: url(${thumbnailUrl}); background-size: cover; background-position: center;">

@@ -18,6 +18,7 @@ class ModelViewer {
         this.controls = null;
         this.model = null;
         this.isInitialized = false;
+        this.dracoLoader = null;
         
         // Initialize if container exists
         if (this.container) {
@@ -38,9 +39,15 @@ class ModelViewer {
             this.scene = new THREE.Scene();
             this.scene.background = new THREE.Color(this.options.backgroundColor);
             
-            // Set up renderer
-            this.renderer = new THREE.WebGLRenderer({ antialias: true });
+            // Set up renderer with anti-aliasing and better shadow mapping
+            this.renderer = new THREE.WebGLRenderer({ 
+                antialias: true,
+                alpha: true
+            });
             this.renderer.setPixelRatio(window.devicePixelRatio);
+            this.renderer.shadowMap.enabled = true;
+            this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            this.renderer.outputEncoding = THREE.sRGBEncoding;
             this.updateSize();
             this.container.appendChild(this.renderer.domElement);
             
@@ -54,12 +61,19 @@ class ModelViewer {
             );
             
             // Set up controls
-            if (typeof THREE.OrbitControls !== 'undefined') {
+            if (typeof OrbitControls !== 'undefined') {
+                this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+                this.controls.enableDamping = true;
+                this.controls.dampingFactor = 0.25;
+                this.controls.screenSpacePanning = false;
+                this.controls.maxPolarAngle = Math.PI / 1.5;
+                this.controls.target.set(0, 0, 0);
+            } else if (typeof THREE.OrbitControls !== 'undefined') {
                 this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
                 this.controls.enableDamping = true;
                 this.controls.dampingFactor = 0.25;
             } else {
-                console.warn('THREE.OrbitControls not available. Using basic camera controls.');
+                console.warn('OrbitControls not available. Using basic camera controls.');
             }
             
             // Add lights
@@ -70,13 +84,12 @@ class ModelViewer {
                 this.addHelpers();
             }
             
+            // Create default scene objects
+            this.createDefaultObjects();
+            
             // Load model if path is provided
             if (this.options.modelPath) {
-                // Try to load as a simple model first
-                this.loadSimpleModel(this.options.modelPath, this.options.modelType);
-            } else {
-                // Create a default cube
-                this.createDefaultCube();
+                this.loadModelWithDraco(this.options.modelPath, this.options.modelType);
             }
             
             // Start animation loop
@@ -97,15 +110,23 @@ class ModelViewer {
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
         this.scene.add(ambientLight);
         
-        // Add directional light
+        // Add directional light with shadows
         const dirLight1 = new THREE.DirectionalLight(0xffffff, 1);
-        dirLight1.position.set(1, 1, 1);
+        dirLight1.position.set(5, 10, 5);
+        dirLight1.castShadow = true;
+        dirLight1.shadow.mapSize.width = 1024;
+        dirLight1.shadow.mapSize.height = 1024;
         this.scene.add(dirLight1);
         
         // Add another directional light from the opposite direction
         const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
-        dirLight2.position.set(-1, -1, -1);
+        dirLight2.position.set(-5, 5, -5);
         this.scene.add(dirLight2);
+        
+        // Add hemisphere light
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.5);
+        hemiLight.position.set(0, 20, 0);
+        this.scene.add(hemiLight);
     }
     
     addHelpers() {
@@ -118,22 +139,23 @@ class ModelViewer {
         this.scene.add(gridHelper);
     }
     
-    createDefaultCube() {
-        // Create a simple cube as a placeholder
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshStandardMaterial({ 
-            color: 0x3498db,
+    createDefaultObjects() {
+        // Create a ground plane
+        const groundGeometry = new THREE.PlaneGeometry(20, 20);
+        const groundMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0xbbbbbb,
+            roughness: 0.8,
             metalness: 0.2,
-            roughness: 0.7
+            side: THREE.DoubleSide
         });
-        this.model = new THREE.Mesh(geometry, material);
-        this.scene.add(this.model);
-        
-        // Add animation for the cube
-        this.cubeAnimation = true;
+        const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
+        groundMesh.rotation.x = Math.PI / 2;
+        groundMesh.receiveShadow = true;
+        groundMesh.position.y = -2;
+        this.scene.add(groundMesh);
     }
     
-    loadSimpleModel(path, type = 'glb') {
+    loadModelWithDraco(path, type = 'glb') {
         // Clear existing model
         if (this.model) {
             this.scene.remove(this.model);
@@ -143,17 +165,44 @@ class ModelViewer {
         // Show loading indicator
         this.showLoading(true);
         
-        let loader;
-        
         try {
-            // Set up a basic OBJ loader without Draco compression
+            // Set up proper loader based on type
+            let loader;
+            
             if (type.toLowerCase() === 'obj' && typeof THREE.OBJLoader !== 'undefined') {
                 loader = new THREE.OBJLoader();
-            } 
-            // Set up a basic GLTF loader without Draco compression
-            else if ((type.toLowerCase() === 'gltf' || type.toLowerCase() === 'glb') && 
-                     typeof THREE.GLTFLoader !== 'undefined') {
-                loader = new THREE.GLTFLoader();
+            } else if ((type.toLowerCase() === 'gltf' || type.toLowerCase() === 'glb')) {
+                // Use the newer GLTFLoader if available
+                if (typeof GLTFLoader !== 'undefined') {
+                    loader = new GLTFLoader();
+                    
+                    // Set up DRACOLoader if available
+                    if (typeof DRACOLoader !== 'undefined') {
+                        this.dracoLoader = new DRACOLoader();
+                        this.dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+                        loader.setDRACOLoader(this.dracoLoader);
+                        console.log('DRACOLoader setup complete');
+                    } else if (typeof THREE.DRACOLoader !== 'undefined') {
+                        // Fallback to older THREE.DRACOLoader
+                        this.dracoLoader = new THREE.DRACOLoader();
+                        this.dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+                        loader.setDRACOLoader(this.dracoLoader);
+                        console.log('Fallback DRACOLoader setup complete');
+                    } else {
+                        console.warn('DRACOLoader not available. Compressed models may not load correctly.');
+                    }
+                } else if (typeof THREE.GLTFLoader !== 'undefined') {
+                    // Fallback to older THREE.GLTFLoader
+                    loader = new THREE.GLTFLoader();
+                    
+                    if (typeof THREE.DRACOLoader !== 'undefined') {
+                        this.dracoLoader = new THREE.DRACOLoader();
+                        this.dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+                        loader.setDRACOLoader(this.dracoLoader);
+                    }
+                } else {
+                    throw new Error('GLTFLoader not available');
+                }
             } else {
                 throw new Error(`Loader for ${type} not available`);
             }
@@ -167,6 +216,8 @@ class ModelViewer {
                 modelPath = new URL(modelPath, baseUrl).href;
             }
             
+            console.log('Loading model from:', modelPath);
+            
             // Load the model
             loader.load(
                 modelPath,
@@ -178,6 +229,25 @@ class ModelViewer {
                         this.model = object;
                     }
                     
+                    // Add shadows to all meshes
+                    this.model.traverse(node => {
+                        if (node.isMesh) {
+                            node.castShadow = true;
+                            node.receiveShadow = true;
+                            
+                            // Fix materials if needed
+                            if (node.material) {
+                                if (Array.isArray(node.material)) {
+                                    node.material.forEach(mat => {
+                                        mat.side = THREE.DoubleSide;
+                                    });
+                                } else {
+                                    node.material.side = THREE.DoubleSide;
+                                }
+                            }
+                        }
+                    });
+                    
                     // Center model
                     this.centerModel();
                     
@@ -186,6 +256,8 @@ class ModelViewer {
                     
                     // Hide loading indicator
                     this.showLoading(false);
+                    
+                    console.log('Model loaded successfully');
                 },
                 (xhr) => {
                     // Progress callback
@@ -201,7 +273,7 @@ class ModelViewer {
                     this.showError('Error loading 3D model: ' + error.message);
                     
                     // Fall back to a simple cube
-                    this.createDefaultCube();
+                    this.createCube();
                 }
             );
         } catch (error) {
@@ -210,8 +282,25 @@ class ModelViewer {
             this.showError('Error setting up model loader: ' + error.message);
             
             // Fall back to a simple cube
-            this.createDefaultCube();
+            this.createCube();
         }
+    }
+    
+    createCube() {
+        // Create a simple cube as a placeholder
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshStandardMaterial({ 
+            color: 0x3498db,
+            metalness: 0.2,
+            roughness: 0.7
+        });
+        this.model = new THREE.Mesh(geometry, material);
+        this.model.castShadow = true;
+        this.model.receiveShadow = true;
+        this.scene.add(this.model);
+        
+        // Add animation for the cube
+        this.cubeAnimation = true;
     }
     
     centerModel() {
@@ -372,17 +461,21 @@ class ModelViewer {
         errorEl.innerHTML = `
             <div>
                 <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem; color: #f39c12;"></i>
+                <h3 style="margin-bottom: 1rem;">3D Model Error</h3>
                 <p>${message}</p>
                 <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
-                    The model may use compressed geometry (Draco) or other features not supported by this viewer.
+                    This may be due to compressed geometry (Draco) or other features not supported by this viewer.
                 </p>
-                <div style="margin-top: 1rem;">
+                <div style="margin-top: 1.5rem;">
                     <button id="retry-load-model" style="margin-right: 0.5rem; padding: 0.5rem 1rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                        Retry
+                        <i class="fas fa-sync-alt"></i> Retry
                     </button>
                     <button id="load-simple-model" style="padding: 0.5rem 1rem; background: #2ecc71; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                        Show Demo Model
+                        <i class="fas fa-cube"></i> Show Demo Model
                     </button>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <a href="index.html" style="color: #3498db; text-decoration: underline;">Return to 2D Map</a>
                 </div>
             </div>
         `;
@@ -393,7 +486,7 @@ class ModelViewer {
             retryButton.addEventListener('click', () => {
                 errorEl.style.display = 'none';
                 if (this.options.modelPath) {
-                    this.loadSimpleModel(this.options.modelPath, this.options.modelType);
+                    this.loadModelWithDraco(this.options.modelPath, this.options.modelType);
                 }
             });
         }
@@ -404,7 +497,7 @@ class ModelViewer {
             simpleModelButton.addEventListener('click', () => {
                 errorEl.style.display = 'none';
                 // Create a simple cube as a placeholder
-                this.createDefaultCube();
+                this.createCube();
             });
         }
         
