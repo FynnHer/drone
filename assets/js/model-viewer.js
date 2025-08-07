@@ -47,13 +47,20 @@ class ModelViewer {
             this.renderer.setPixelRatio(window.devicePixelRatio);
             this.renderer.shadowMap.enabled = true;
             this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            this.renderer.outputEncoding = THREE.sRGBEncoding;
+            
+            // Handle different THREE.js versions
+            if (THREE.sRGBEncoding !== undefined) {
+                this.renderer.outputEncoding = THREE.sRGBEncoding;
+            } else if (THREE.OutputEncoding !== undefined) {
+                this.renderer.outputEncoding = THREE.OutputEncoding;
+            }
+            
             this.updateSize();
             this.container.appendChild(this.renderer.domElement);
             
             // Set up camera
             const aspect = this.container.clientWidth / this.container.clientHeight;
-            this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+            this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 2000);
             this.camera.position.set(
                 this.options.cameraPosition.x,
                 this.options.cameraPosition.y,
@@ -66,12 +73,14 @@ class ModelViewer {
                 this.controls.enableDamping = true;
                 this.controls.dampingFactor = 0.25;
                 this.controls.screenSpacePanning = false;
-                this.controls.maxPolarAngle = Math.PI / 1.5;
+                this.controls.maxPolarAngle = Math.PI;
                 this.controls.target.set(0, 0, 0);
+                this.controls.update();
             } else if (typeof THREE.OrbitControls !== 'undefined') {
                 this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
                 this.controls.enableDamping = true;
                 this.controls.dampingFactor = 0.25;
+                this.controls.update();
             } else {
                 console.warn('OrbitControls not available. Using basic camera controls.');
             }
@@ -84,12 +93,15 @@ class ModelViewer {
                 this.addHelpers();
             }
             
-            // Create default scene objects
+            // Create default scene objects for orientation
             this.createDefaultObjects();
             
             // Load model if path is provided
             if (this.options.modelPath) {
                 this.loadModelWithDraco(this.options.modelPath, this.options.modelType);
+            } else {
+                // Create a demo cube if no model path
+                this.createDemoCube();
             }
             
             // Start animation loop
@@ -106,8 +118,8 @@ class ModelViewer {
     }
     
     addLights() {
-        // Add ambient light
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        // Add ambient light - brighter for better visibility
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
         this.scene.add(ambientLight);
         
         // Add directional light with shadows
@@ -116,32 +128,51 @@ class ModelViewer {
         dirLight1.castShadow = true;
         dirLight1.shadow.mapSize.width = 1024;
         dirLight1.shadow.mapSize.height = 1024;
+        dirLight1.shadow.camera.far = 50;
+        dirLight1.shadow.camera.near = 0.1;
+        dirLight1.shadow.camera.left = -10;
+        dirLight1.shadow.camera.right = 10;
+        dirLight1.shadow.camera.top = 10;
+        dirLight1.shadow.camera.bottom = -10;
         this.scene.add(dirLight1);
         
         // Add another directional light from the opposite direction
-        const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+        const dirLight2 = new THREE.DirectionalLight(0xffffff, 1);
         dirLight2.position.set(-5, 5, -5);
         this.scene.add(dirLight2);
         
-        // Add hemisphere light
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.5);
-        hemiLight.position.set(0, 20, 0);
-        this.scene.add(hemiLight);
+        // Add point light at camera position to ensure model is lit from viewing angle
+        const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+        pointLight.position.copy(this.camera.position);
+        this.camera.add(pointLight);
+        this.scene.add(this.camera);
     }
     
     addHelpers() {
         // Add axes helper
-        const axesHelper = new THREE.AxesHelper(5);
+        const axesHelper = new THREE.AxesHelper(10);
         this.scene.add(axesHelper);
         
-        // Add grid helper
-        const gridHelper = new THREE.GridHelper(10, 10);
+        // Add grid helper - larger and more visible
+        const gridHelper = new THREE.GridHelper(20, 20, 0x888888, 0x444444);
+        gridHelper.position.y = -0.01; // Slightly below origin to avoid z-fighting
         this.scene.add(gridHelper);
+        
+        // Add a directional light helper to see light direction
+        if (this.scene.children.length > 0) {
+            for (let child of this.scene.children) {
+                if (child instanceof THREE.DirectionalLight) {
+                    const helper = new THREE.DirectionalLightHelper(child, 5);
+                    this.scene.add(helper);
+                    break;
+                }
+            }
+        }
     }
     
     createDefaultObjects() {
-        // Create a ground plane
-        const groundGeometry = new THREE.PlaneGeometry(20, 20);
+        // Create a ground plane for better orientation
+        const groundGeometry = new THREE.PlaneGeometry(40, 40);
         const groundMaterial = new THREE.MeshStandardMaterial({ 
             color: 0xbbbbbb,
             roughness: 0.8,
@@ -151,8 +182,34 @@ class ModelViewer {
         const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
         groundMesh.rotation.x = Math.PI / 2;
         groundMesh.receiveShadow = true;
-        groundMesh.position.y = -2;
+        groundMesh.position.y = -0.02; // Slightly below grid
         this.scene.add(groundMesh);
+    }
+    
+    createDemoCube() {
+        // Create a colorful demo cube
+        const geometry = new THREE.BoxGeometry(2, 2, 2);
+        
+        // Create materials with different colors for each face
+        const materials = [
+            new THREE.MeshStandardMaterial({ color: 0xff0000 }), // red
+            new THREE.MeshStandardMaterial({ color: 0x00ff00 }), // green
+            new THREE.MeshStandardMaterial({ color: 0x0000ff }), // blue
+            new THREE.MeshStandardMaterial({ color: 0xffff00 }), // yellow
+            new THREE.MeshStandardMaterial({ color: 0xff00ff }), // magenta
+            new THREE.MeshStandardMaterial({ color: 0x00ffff })  // cyan
+        ];
+        
+        this.model = new THREE.Mesh(geometry, materials);
+        this.model.castShadow = true;
+        this.model.receiveShadow = true;
+        this.model.position.set(0, 1, 0); // Position above the ground
+        this.scene.add(this.model);
+        
+        // Add animation for the cube
+        this.cubeAnimation = true;
+        
+        console.log('Demo cube created and added to scene');
     }
     
     loadModelWithDraco(path, type = 'glb') {
@@ -225,9 +282,14 @@ class ModelViewer {
                     // Handle different model formats
                     if (type.toLowerCase() === 'gltf' || type.toLowerCase() === 'glb') {
                         this.model = object.scene;
+                        console.log('GLTF/GLB model loaded:', object);
                     } else {
                         this.model = object;
+                        console.log('OBJ model loaded:', object);
                     }
+                    
+                    // Debug model structure
+                    this.logModelStructure(this.model);
                     
                     // Add shadows to all meshes
                     this.model.traverse(node => {
@@ -245,17 +307,22 @@ class ModelViewer {
                                     node.material.side = THREE.DoubleSide;
                                 }
                             }
+                            console.log('Processed mesh:', node.name);
                         }
                     });
                     
-                    // Center model
-                    this.centerModel();
+                    // Center and scale model
+                    this.centerAndScaleModel();
                     
                     // Add to scene
                     this.scene.add(this.model);
+                    console.log('Model added to scene');
                     
                     // Hide loading indicator
                     this.showLoading(false);
+                    
+                    // Reset camera position based on model size
+                    this.resetCameraPosition();
                     
                     console.log('Model loaded successfully');
                 },
@@ -272,8 +339,8 @@ class ModelViewer {
                     this.showLoading(false);
                     this.showError('Error loading 3D model: ' + error.message);
                     
-                    // Fall back to a simple cube
-                    this.createCube();
+                    // Fall back to a demo cube
+                    this.createDemoCube();
                 }
             );
         } catch (error) {
@@ -281,29 +348,29 @@ class ModelViewer {
             this.showLoading(false);
             this.showError('Error setting up model loader: ' + error.message);
             
-            // Fall back to a simple cube
-            this.createCube();
+            // Fall back to a demo cube
+            this.createDemoCube();
         }
     }
     
-    createCube() {
-        // Create a simple cube as a placeholder
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshStandardMaterial({ 
-            color: 0x3498db,
-            metalness: 0.2,
-            roughness: 0.7
-        });
-        this.model = new THREE.Mesh(geometry, material);
-        this.model.castShadow = true;
-        this.model.receiveShadow = true;
-        this.scene.add(this.model);
+    logModelStructure(model, level = 0) {
+        if (!model) return;
         
-        // Add animation for the cube
-        this.cubeAnimation = true;
+        const indent = '  '.repeat(level);
+        console.log(`${indent}Node: ${model.name || 'unnamed'} (type: ${model.type || 'unknown'})`);
+        
+        if (model.isMesh) {
+            console.log(`${indent}  - Mesh with geometry: vertices=${model.geometry?.attributes?.position?.count || 'unknown'}`);
+            console.log(`${indent}  - Material: ${model.material?.type || 'unknown'}`);
+        }
+        
+        if (model.children && model.children.length > 0) {
+            console.log(`${indent}Children (${model.children.length}):`);
+            model.children.forEach(child => this.logModelStructure(child, level + 1));
+        }
     }
     
-    centerModel() {
+    centerAndScaleModel() {
         if (!this.model) return;
         
         try {
@@ -314,16 +381,55 @@ class ModelViewer {
             const center = new THREE.Vector3();
             boundingBox.getCenter(center);
             
+            // Get size of the model
+            const size = new THREE.Vector3();
+            boundingBox.getSize(size);
+            const maxDim = Math.max(size.x, size.y, size.z);
+            
+            console.log('Model dimensions:', size);
+            console.log('Model center:', center);
+            
+            // If model is extremely large or small, scale it
+            if (maxDim > 100 || maxDim < 0.1) {
+                const scale = 10 / maxDim;
+                this.model.scale.set(scale, scale, scale);
+                console.log(`Model rescaled with factor ${scale}`);
+                
+                // Recompute bounding box after scaling
+                boundingBox.setFromObject(this.model);
+                boundingBox.getCenter(center);
+                boundingBox.getSize(size);
+                console.log('New model dimensions after scaling:', size);
+            }
+            
             // Move model so its center is at the origin
             this.model.position.sub(center);
             
-            // Get size of the model to adjust camera
+            // Move model slightly up to ensure it's above the ground
+            const minY = boundingBox.min.y;
+            if (minY < 0) {
+                this.model.position.y -= minY;
+                console.log('Model raised by', -minY, 'units to sit on ground');
+            }
+        } catch (error) {
+            console.warn('Error centering/scaling model:', error);
+        }
+    }
+    
+    resetCameraPosition() {
+        if (!this.model) return;
+        
+        try {
+            // Create a bounding box
+            const boundingBox = new THREE.Box3().setFromObject(this.model);
+            
+            // Get size of the model
             const size = new THREE.Vector3();
             boundingBox.getSize(size);
             const maxDim = Math.max(size.x, size.y, size.z);
             
             // Position camera based on model size
-            const distance = maxDim * 2;
+            const distance = maxDim * 2.5;
             this.camera.position.set(distance, distance, distance);
             this.camera.lookAt(0, 0, 0);
             
@@ -332,8 +438,10 @@ class ModelViewer {
                 this.controls.target.set(0, 0, 0);
                 this.controls.update();
             }
+            
+            console.log('Camera reset to position:', this.camera.position);
         } catch (error) {
-            console.warn('Error centering model:', error);
+            console.warn('Error resetting camera:', error);
         }
     }
     
@@ -431,7 +539,9 @@ class ModelViewer {
     updateLoadingProgress(percent) {
         const progressEl = this.container.querySelector('.model-loading .loading-progress');
         if (progressEl) {
-            progressEl.textContent = `${percent}%`;
+            // Ensure percent doesn't exceed 100%
+            const safePercent = Math.min(100, Math.max(0, parseFloat(percent)));
+            progressEl.textContent = `${safePercent}%`;
         }
     }
     
@@ -497,7 +607,7 @@ class ModelViewer {
             simpleModelButton.addEventListener('click', () => {
                 errorEl.style.display = 'none';
                 // Create a simple cube as a placeholder
-                this.createCube();
+                this.createDemoCube();
             });
         }
         

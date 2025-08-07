@@ -179,7 +179,7 @@ function createProjectCard(project) {
         // Use OpenStreetMap static map API (no API key required)
         const [lat, lng] = project.mapCenter;
         const zoom = 14;
-        thumbnailUrl = `https://maps.geoapify.com/v1/staticmap?style=dark-matter-yellow-roads&center=lonlat:${lng},${lat}&width=300&height=180&apiKey=e6229210dee94e6fbde74a3807abd1ee`;
+        thumbnailUrl = `https://maps.geoapify.com/v1/staticmap?style=dark-matter-yellow-roads&center=lonlat:${lng},${lat}&width=300&height=180&zoom=${zoom}&apiKey=e6229210dee94e6fbde74a3807abd1ee`;
     }
     
     // Fallback to a map-like image if no thumbnail or coordinates available
