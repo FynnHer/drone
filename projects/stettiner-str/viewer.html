@@ -102,21 +102,32 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- Three.js and related libraries (modern ES modules) -->
+    <!-- Import map to ensure proper module loading -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+        }
+    }
+    </script>
+    
+    <!-- Three.js ESModules for better compatibility with newer features -->
     <script type="module">
-        import * as THREE from 'https://unpkg.com/three@0.158.0/build/three.module.js';
-        import { OrbitControls } from 'https://unpkg.com/three@0.158.0/examples/jsm/controls/OrbitControls.js';
-        import { GLTFLoader } from 'https://unpkg.com/three@0.158.0/examples/jsm/loaders/GLTFLoader.js';
-        import { DRACOLoader } from 'https://unpkg.com/three@0.158.0/examples/jsm/loaders/DRACOLoader.js';
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
         
-        // Make Three.js and related modules available globally
         window.THREE = THREE;
         window.OrbitControls = OrbitControls;
         window.GLTFLoader = GLTFLoader;
         window.DRACOLoader = DRACOLoader;
         
-        // Signal that modules are loaded and dispatch event
+        // Signal that modules are loaded
         window.threeModulesLoaded = true;
+        
+        // Dispatch event when loaded
         window.dispatchEvent(new Event('threeModulesLoaded'));
     </script>
     
@@ -126,7 +137,7 @@
     <script src="../../assets/js/viewer.js"></script>
     
     <script>
-        // Initialize the project when Three.js modules are loaded
+        // Initialize the project
         function initializeWhenReady() {
             // Try to load metadata from metadata.json
             fetch('./metadata.json')
