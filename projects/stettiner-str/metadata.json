@@ -1,0 +1,72 @@
+{
+  "title": "Sample Drone Mapping Project",
+  "date": "2025-08-01",
+  "location": "Coastal Region",
+  "description": "This is a sample drone mapping project showcasing coastline features and terrain.",
+  "mapSettings": {
+    "center": [51.505, -0.09],
+    "zoom": 13,
+    "minZoom": 10,
+    "maxZoom": 19,
+    "layers": [
+      {
+        "id": "base",
+        "type": "tile",
+        "name": "OpenStreetMap",
+        "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "visible": true,
+        "layerType": "base",
+        "options": {
+          "attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"
+        }
+      },
+      {
+        "id": "satellite",
+        "type": "tile",
+        "name": "Satellite Imagery",
+        "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        "visible": false,
+        "layerType": "base",
+        "options": {
+          "attribution": "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+        }
+      },
+      {
+        "id": "drone-ortho",
+        "type": "tile",
+        "name": "Drone Orthomosaic",
+        "url": "tiles/{z}/{x}/{y}.png",
+        "visible": true,
+        "options": {
+          "attribution": "Drone Mapping Data",
+          "tms": false,
+          "minZoom": 14,
+          "maxZoom": 19,
+          "opacity": 0.8
+        }
+      }
+    ],
+    "annotations": [
+      {
+        "id": "point1",
+        "name": "Point of Interest 1",
+        "latlng": [51.505, -0.09],
+        "popup": "<b>Point of Interest 1</b><br>Important feature noted during survey.",
+        "visible": true
+      },
+      {
+        "id": "point2",
+        "name": "Point of Interest 2",
+        "latlng": [51.51, -0.1],
+        "popup": "<b>Point of Interest 2</b><br>Secondary feature with notable characteristics.",
+        "visible": true
+      }
+    ]
+  },
+  "modelSettings": {
+    "modelPath": "models/terrain.glb",
+    "modelType": "glb",
+    "backgroundColor": "#222222",
+    "showHelpers": true
+  }
+}
