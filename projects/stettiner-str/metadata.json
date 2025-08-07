@@ -4,7 +4,7 @@
   "location": "DLRG Landau Vereinsheim - Stettiner Straße",
   "description": "This is a sample drone mapping project showcasing coastline features and terrain.",
   "mapSettings": {
-    "center": [49.205, 8.14],
+    "center": [49.203, 8.14],
     "zoom": 13,
     "minZoom": 10,
     "maxZoom": 19,
