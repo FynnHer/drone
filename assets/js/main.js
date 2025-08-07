@@ -21,37 +21,49 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Load projects
-    loadProjects();
+    // Load projects directly from filesystem
+    loadProjectsDirectly();
 });
 
-// Function to load projects dynamically
-async function loadProjects() {
+// Function to load projects by scanning the projects directory
+async function loadProjectsDirectly() {
     const projectsList = document.getElementById('projects-list');
     
     try {
-        // Fetch the list of projects (this could be from a JSON file or by scanning directories)
-        const response = await fetch('assets/data/projects.json');
-        
-        // If the file doesn't exist yet, show sample projects
-        if (!response.ok) {
-            showSampleProjects(projectsList);
-            return;
-        }
-        
-        const projects = await response.json();
+        // Fetch all project directories
+        const projectFolders = await fetchProjectFolders();
         
         // Clear loading indicator
         projectsList.innerHTML = '';
         
         // Display each project
-        projects.forEach(project => {
-            const projectCard = createProjectCard(project);
-            projectsList.appendChild(projectCard);
-        });
+        for (const projectFolder of projectFolders) {
+            try {
+                // Attempt to load metadata from the project folder
+                const metadata = await fetchProjectMetadata(projectFolder);
+                const projectCard = createProjectCard({
+                    id: projectFolder,
+                    title: metadata.title || projectFolder,
+                    description: metadata.description || 'No description available.',
+                    date: metadata.date,
+                    location: metadata.location,
+                    thumbnail: metadata.thumbnail
+                });
+                projectsList.appendChild(projectCard);
+            } catch (error) {
+                // If no metadata.json, try to create a basic card from the folder name
+                console.warn(`No metadata for project ${projectFolder}:`, error);
+                const projectCard = createProjectCard({
+                    id: projectFolder,
+                    title: projectFolder.charAt(0).toUpperCase() + projectFolder.slice(1).replace(/-/g, ' '),
+                    description: 'No description available.',
+                });
+                projectsList.appendChild(projectCard);
+            }
+        }
         
         // If no projects found
-        if (projects.length === 0) {
+        if (projectFolders.length === 0) {
             projectsList.innerHTML = '<div class="no-projects">No projects found. Add your first drone mapping project to get started.</div>';
         }
     } catch (error) {
@@ -60,54 +72,72 @@ async function loadProjects() {
     }
 }
 
-// Function to show sample projects when no projects.json exists yet
-function showSampleProjects(container) {
-    container.innerHTML = '';
+// Function to fetch project folders
+async function fetchProjectFolders() {
+    // This is a simplified approach - GitHub Pages doesn't allow directory listing
+    // So we'll check for the presence of a few known project folders
+    const knownProjects = ['sample'];
     
-    // Sample projects to demonstrate the UI
-    const sampleProjects = [
-        {
-            id: 'sample1',
-            title: 'Forest Survey',
-            description: 'Aerial mapping of northern forest region showing canopy coverage and terrain.',
-            date: '2025-07-15',
-            thumbnail: 'https://via.placeholder.com/300x180?text=Forest+Survey',
-            location: 'Northern Region'
-        },
-        {
-            id: 'sample2',
-            title: 'Urban Development Site',
-            description: 'Detailed mapping of construction site with progress tracking.',
-            date: '2025-08-01',
-            thumbnail: 'https://via.placeholder.com/300x180?text=Urban+Development',
-            location: 'Downtown Area'
-        },
-        {
-            id: 'sample3',
-            title: 'Coastal Erosion Study',
-            description: 'Monitoring of coastline changes over time with detailed elevation model.',
-            date: '2025-07-23',
-            thumbnail: 'https://via.placeholder.com/300x180?text=Coastal+Mapping',
-            location: 'Eastern Shoreline'
+    // Add any subfolders from the projects directory that have been explicitly added
+    // This part would normally be generated server-side, but for GitHub Pages we need to hardcode it
+    const additionalProjects = [];
+    
+    // Add any folder that has an index.html file in the projects directory
+    try {
+        // We'll check for 'project-1', 'project-2', etc. to see if they exist
+        const possibleProjects = ['project-1', 'project-2', 'coastline-survey', 'urban-mapping', 'forest-survey'];
+        for (const projectName of possibleProjects) {
+            try {
+                const response = await fetch(`projects/${projectName}/index.html`, { method: 'HEAD' });
+                if (response.ok) {
+                    additionalProjects.push(projectName);
+                }
+            } catch (e) {
+                // Folder doesn't exist, skip
+            }
         }
-    ];
+    } catch (e) {
+        console.warn('Error checking for additional projects:', e);
+    }
     
-    sampleProjects.forEach(project => {
-        const projectCard = createProjectCard(project);
-        container.appendChild(projectCard);
-    });
+    // Combine known and discovered projects
+    const allProjects = [...knownProjects, ...additionalProjects];
     
-    // Add note about sample projects
-    const note = document.createElement('div');
-    note.className = 'sample-note';
-    note.style.gridColumn = '1 / -1';
-    note.style.marginTop = '1rem';
-    note.style.padding = '1rem';
-    note.style.backgroundColor = 'var(--card-bg)';
-    note.style.borderRadius = '8px';
-    note.style.textAlign = 'center';
-    note.innerHTML = '<p><i class="fas fa-info-circle"></i> These are sample projects. Add your own projects by creating folders in the "projects" directory.</p>';
-    container.appendChild(note);
+    // Deduplicate
+    return [...new Set(allProjects)];
+}
+
+// Function to fetch project metadata
+async function fetchProjectMetadata(projectFolder) {
+    try {
+        const response = await fetch(`projects/${projectFolder}/metadata.json`);
+        if (!response.ok) {
+            throw new Error(`Failed to load metadata for ${projectFolder}`);
+        }
+        return await response.json();
+    } catch (error) {
+        // If no metadata.json, check if there's an index.html file and extract basic metadata
+        try {
+            const htmlResponse = await fetch(`projects/${projectFolder}/index.html`);
+            if (htmlResponse.ok) {
+                const html = await htmlResponse.text();
+                // Extract title from HTML
+                const titleMatch = html.match(/<title>(.*?)<\/title>/i);
+                const title = titleMatch ? titleMatch[1] : projectFolder;
+                
+                // Generate a basic metadata object
+                return {
+                    title: title,
+                    description: `${title} mapping project`,
+                    date: new Date().toISOString().split('T')[0]
+                };
+            }
+        } catch (e) {
+            console.warn(`Could not extract metadata from index.html for ${projectFolder}:`, e);
+        }
+        
+        throw error;
+    }
 }
 
 // Function to create a project card element
@@ -135,10 +165,82 @@ function createProjectCard(project) {
     `;
     
     card.addEventListener('click', function() {
-        window.location.href = `projects/${project.id}/`;
+        // Check if the project has a viewer.html file, otherwise use index.html
+        checkFileExists(`projects/${project.id}/viewer.html`)
+            .then(exists => {
+                if (exists) {
+                    window.location.href = `projects/${project.id}/viewer.html`;
+                } else {
+                    window.location.href = `projects/${project.id}/index.html`;
+                }
+            })
+            .catch(() => {
+                // Default to index.html if check fails
+                window.location.href = `projects/${project.id}/index.html`;
+            });
     });
     
     return card;
+}
+
+// Function to check if a file exists
+async function checkFileExists(url) {
+    try {
+        const response = await fetch(url, { method: 'HEAD' });
+        return response.ok;
+    } catch {
+        return false;
+    }
+}
+
+// Function to show sample projects when no projects are found
+function showSampleProjects(container) {
+    container.innerHTML = '';
+    
+    // Sample projects to demonstrate the UI
+    const sampleProjects = [
+        {
+            id: 'sample',
+            title: 'Forest Survey',
+            description: 'Aerial mapping of northern forest region showing canopy coverage and terrain.',
+            date: '2025-07-15',
+            thumbnail: 'https://via.placeholder.com/300x180?text=Forest+Survey',
+            location: 'Northern Region'
+        },
+        {
+            id: 'sample',
+            title: 'Urban Development Site',
+            description: 'Detailed mapping of construction site with progress tracking.',
+            date: '2025-08-01',
+            thumbnail: 'https://via.placeholder.com/300x180?text=Urban+Development',
+            location: 'Downtown Area'
+        },
+        {
+            id: 'sample',
+            title: 'Coastal Erosion Study',
+            description: 'Monitoring of coastline changes over time with detailed elevation model.',
+            date: '2025-07-23',
+            thumbnail: 'https://via.placeholder.com/300x180?text=Coastal+Mapping',
+            location: 'Eastern Shoreline'
+        }
+    ];
+    
+    sampleProjects.forEach(project => {
+        const projectCard = createProjectCard(project);
+        container.appendChild(projectCard);
+    });
+    
+    // Add note about sample projects
+    const note = document.createElement('div');
+    note.className = 'sample-note';
+    note.style.gridColumn = '1 / -1';
+    note.style.marginTop = '1rem';
+    note.style.padding = '1rem';
+    note.style.backgroundColor = 'var(--card-bg)';
+    note.style.borderRadius = '8px';
+    note.style.textAlign = 'center';
+    note.innerHTML = '<p><i class="fas fa-info-circle"></i> These are sample projects. Add your own projects by creating folders in the "projects" directory.</p>';
+    container.appendChild(note);
 }
 
 // Function to format dates

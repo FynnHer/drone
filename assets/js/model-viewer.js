@@ -26,50 +26,66 @@ class ModelViewer {
     }
     
     init() {
-        // Create scene
-        this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(this.options.backgroundColor);
-        
-        // Set up renderer
-        this.renderer = new THREE.WebGLRenderer({ antialias: true });
-        this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.updateSize();
-        this.container.appendChild(this.renderer.domElement);
-        
-        // Set up camera
-        const aspect = this.container.clientWidth / this.container.clientHeight;
-        this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
-        this.camera.position.set(
-            this.options.cameraPosition.x,
-            this.options.cameraPosition.y,
-            this.options.cameraPosition.z
-        );
-        
-        // Set up controls
-        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-        this.controls.enableDamping = true;
-        this.controls.dampingFactor = 0.25;
-        
-        // Add lights
-        this.addLights();
-        
-        // Add helpers
-        if (this.options.showHelpers) {
-            this.addHelpers();
+        // Check if Three.js is available
+        if (typeof THREE === 'undefined') {
+            console.error('Three.js library not loaded. Cannot initialize 3D viewer.');
+            this.showError('Three.js library not loaded. Cannot initialize 3D viewer.');
+            return;
         }
         
-        // Load model if path is provided
-        if (this.options.modelPath) {
-            this.loadModel(this.options.modelPath, this.options.modelType);
+        try {
+            // Create scene
+            this.scene = new THREE.Scene();
+            this.scene.background = new THREE.Color(this.options.backgroundColor);
+            
+            // Set up renderer
+            this.renderer = new THREE.WebGLRenderer({ antialias: true });
+            this.renderer.setPixelRatio(window.devicePixelRatio);
+            this.updateSize();
+            this.container.appendChild(this.renderer.domElement);
+            
+            // Set up camera
+            const aspect = this.container.clientWidth / this.container.clientHeight;
+            this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+            this.camera.position.set(
+                this.options.cameraPosition.x,
+                this.options.cameraPosition.y,
+                this.options.cameraPosition.z
+            );
+            
+            // Set up controls
+            if (typeof THREE.OrbitControls !== 'undefined') {
+                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+                this.controls.enableDamping = true;
+                this.controls.dampingFactor = 0.25;
+            } else {
+                console.warn('THREE.OrbitControls not available. Using basic camera controls.');
+            }
+            
+            // Add lights
+            this.addLights();
+            
+            // Add helpers
+            if (this.options.showHelpers) {
+                this.addHelpers();
+            }
+            
+            // Load model if path is provided
+            if (this.options.modelPath) {
+                this.loadModel(this.options.modelPath, this.options.modelType);
+            }
+            
+            // Start animation loop
+            this.animate();
+            
+            // Add event listener for window resize
+            window.addEventListener('resize', () => this.updateSize());
+            
+            this.isInitialized = true;
+        } catch (error) {
+            console.error('Error initializing 3D viewer:', error);
+            this.showError('Failed to initialize 3D viewer: ' + error.message);
         }
-        
-        // Start animation loop
-        this.animate();
-        
-        // Add event listener for window resize
-        window.addEventListener('resize', () => this.updateSize());
-        
-        this.isInitialized = true;
     }
     
     addLights() {
@@ -110,6 +126,20 @@ class ModelViewer {
         
         let loader;
         
+        // Check if required loaders are available
+        if (type.toLowerCase() === 'obj' && typeof THREE.OBJLoader === 'undefined') {
+            this.showLoading(false);
+            this.showError('OBJLoader not available. Cannot load OBJ models.');
+            return;
+        }
+        
+        if ((type.toLowerCase() === 'gltf' || type.toLowerCase() === 'glb') && 
+            typeof THREE.GLTFLoader === 'undefined') {
+            this.showLoading(false);
+            this.showError('GLTFLoader not available. Cannot load GLTF/GLB models.');
+            return;
+        }
+        
         switch (type.toLowerCase()) {
             case 'obj':
                 loader = new THREE.OBJLoader();
@@ -121,8 +151,18 @@ class ModelViewer {
                 break;
         }
         
+        // Make sure the path is absolute if it's not a URL
+        let modelPath = path;
+        if (!modelPath.startsWith('http') && !modelPath.startsWith('/')) {
+            // If it's a relative path, make sure it's relative to the current page
+            const pageUrl = window.location.href;
+            const baseUrl = pageUrl.substring(0, pageUrl.lastIndexOf('/') + 1);
+            modelPath = new URL(modelPath, baseUrl).href;
+        }
+        
+        // Load the model
         loader.load(
-            path,
+            modelPath,
             (object) => {
                 // Handle different model formats
                 if (type.toLowerCase() === 'gltf' || type.toLowerCase() === 'glb') {
@@ -142,14 +182,16 @@ class ModelViewer {
             },
             (xhr) => {
                 // Progress callback
-                const percent = (xhr.loaded / xhr.total * 100).toFixed(0);
-                this.updateLoadingProgress(percent);
+                if (xhr.lengthComputable) {
+                    const percent = (xhr.loaded / xhr.total * 100).toFixed(0);
+                    this.updateLoadingProgress(percent);
+                }
             },
             (error) => {
                 // Error callback
                 console.error('Error loading model:', error);
                 this.showLoading(false);
-                this.showError('Failed to load 3D model');
+                this.showError('Failed to load 3D model: ' + error.message);
             }
         );
     }
@@ -157,29 +199,35 @@ class ModelViewer {
     centerModel() {
         if (!this.model) return;
         
-        // Create a bounding box
-        const boundingBox = new THREE.Box3().setFromObject(this.model);
-        
-        // Get the center of the bounding box
-        const center = new THREE.Vector3();
-        boundingBox.getCenter(center);
-        
-        // Move model so its center is at the origin
-        this.model.position.sub(center);
-        
-        // Get size of the model to adjust camera
-        const size = new THREE.Vector3();
-        boundingBox.getSize(size);
-        const maxDim = Math.max(size.x, size.y, size.z);
-        
-        // Position camera based on model size
-        const distance = maxDim * 2;
-        this.camera.position.set(distance, distance, distance);
-        this.camera.lookAt(0, 0, 0);
-        
-        // Update controls target
-        this.controls.target.set(0, 0, 0);
-        this.controls.update();
+        try {
+            // Create a bounding box
+            const boundingBox = new THREE.Box3().setFromObject(this.model);
+            
+            // Get the center of the bounding box
+            const center = new THREE.Vector3();
+            boundingBox.getCenter(center);
+            
+            // Move model so its center is at the origin
+            this.model.position.sub(center);
+            
+            // Get size of the model to adjust camera
+            const size = new THREE.Vector3();
+            boundingBox.getSize(size);
+            const maxDim = Math.max(size.x, size.y, size.z);
+            
+            // Position camera based on model size
+            const distance = maxDim * 2;
+            this.camera.position.set(distance, distance, distance);
+            this.camera.lookAt(0, 0, 0);
+            
+            // Update controls target
+            if (this.controls) {
+                this.controls.target.set(0, 0, 0);
+                this.controls.update();
+            }
+        } catch (error) {
+            console.warn('Error centering model:', error);
+        }
     }
     
     updateSize() {
@@ -194,6 +242,8 @@ class ModelViewer {
     }
     
     animate() {
+        if (!this.isInitialized) return;
+        
         requestAnimationFrame(() => this.animate());
         
         if (this.controls) {
@@ -244,14 +294,17 @@ class ModelViewer {
                 spinner.style.animation = 'spin 1s linear infinite';
                 
                 // Add keyframe animation
-                const style = document.createElement('style');
-                style.innerHTML = `
-                    @keyframes spin {
-                        0% { transform: rotate(0deg); }
-                        100% { transform: rotate(360deg); }
-                    }
-                `;
-                document.head.appendChild(style);
+                if (!document.getElementById('model-viewer-styles')) {
+                    const style = document.createElement('style');
+                    style.id = 'model-viewer-styles';
+                    style.innerHTML = `
+                        @keyframes spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
                 
                 this.container.appendChild(loadingEl);
             } else {

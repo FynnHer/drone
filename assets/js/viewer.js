@@ -18,9 +18,6 @@ function initializeProject(metadata) {
     // Set page title
     document.title = `${metadata.title || 'Project'} - Drone Mapping Viewer`;
     
-    // Initialize map viewer
-    initMapViewer(metadata.mapSettings || {});
-    
     // Initialize 3D model viewer
     initModelViewer(metadata.modelSettings || {});
     
@@ -28,37 +25,62 @@ function initializeProject(metadata) {
     setupUIControls();
 }
 
-// Initialize the map viewer
-function initMapViewer(settings = {}) {
-    mapViewer = new MapViewer('map-view', settings);
+// Initialize the 3D model viewer
+function initModelViewer(settings = {}) {
+    // Make sure we have defaults for the 3D model settings
+    const modelSettings = {
+        backgroundColor: settings.backgroundColor || 0x222222,
+        modelPath: settings.modelPath || null,
+        modelType: settings.modelType || 'glb',
+        showHelpers: settings.showHelpers !== false,
+        ...settings
+    };
     
-    // Add custom layers from settings
-    if (settings.layers) {
-        settings.layers.forEach(layer => {
-            mapViewer.addCustomLayer(layer);
-        });
-    }
+    // Initialize the model viewer
+    modelViewer = new ModelViewer('model-view', modelSettings);
     
-    // Add annotations from settings
-    if (settings.annotations) {
-        settings.annotations.forEach(annotation => {
-            mapViewer.addAnnotation(
-                annotation.id,
-                annotation.latlng,
-                {
-                    name: annotation.name,
-                    popup: annotation.popup,
-                    visible: annotation.visible !== false,
-                    markerOptions: annotation.options
-                }
-            );
-        });
+    // If no model path was provided, show a helpful message
+    if (!modelSettings.modelPath) {
+        showModelPlaceholder();
     }
 }
 
-// Initialize the 3D model viewer
-function initModelViewer(settings = {}) {
-    modelViewer = new ModelViewer('model-view', settings);
+// Show a placeholder message when no 3D model is available
+function showModelPlaceholder() {
+    const modelView = document.getElementById('model-view');
+    if (!modelView) return;
+    
+    // Clear any existing content
+    modelView.innerHTML = '';
+    
+    // Create placeholder element
+    const placeholder = document.createElement('div');
+    placeholder.className = 'model-placeholder';
+    placeholder.style.display = 'flex';
+    placeholder.style.flexDirection = 'column';
+    placeholder.style.justifyContent = 'center';
+    placeholder.style.alignItems = 'center';
+    placeholder.style.height = '100%';
+    placeholder.style.color = '#fff';
+    placeholder.style.textAlign = 'center';
+    placeholder.style.padding = '2rem';
+    
+    placeholder.innerHTML = `
+        <i class="fas fa-cube" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.6;"></i>
+        <h2>No 3D Model Available</h2>
+        <p style="max-width: 600px; margin: 1rem auto;">
+            This project doesn't have a 3D model configured. 
+            To add a 3D model, place a .glb or .obj file in the models directory 
+            and update the metadata.json file.
+        </p>
+        <div style="margin-top: 1rem;">
+            <a href="index.html" class="action-button" style="background-color: #3498db; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; display: inline-block; margin-top: 1rem;">
+                <i class="fas fa-map"></i> View 2D Map Instead
+            </a>
+        </div>
+    `;
+    
+    modelView.appendChild(placeholder);
 }
 
 // Set up UI controls and event listeners
@@ -92,8 +114,14 @@ function setupUIControls() {
         
         // Resize viewers after sidebar toggle
         setTimeout(() => {
-            if (mapViewer) mapViewer.resize();
             if (modelViewer) modelViewer.resize();
+            // Also trigger resize on any iframes
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                const parent = iframe.parentElement;
+                iframe.style.height = parent.clientHeight + 'px';
+                iframe.style.width = parent.clientWidth + 'px';
+            });
         }, 300); // Match transition duration
     });
     
@@ -129,8 +157,15 @@ function setupUIControls() {
     
     // Handle window resize
     window.addEventListener('resize', () => {
-        if (mapViewer) mapViewer.resize();
         if (modelViewer) modelViewer.resize();
+        
+        // Also resize any iframes
+        const iframes = document.querySelectorAll('iframe');
+        iframes.forEach(iframe => {
+            const parent = iframe.parentElement;
+            iframe.style.height = parent.clientHeight + 'px';
+            iframe.style.width = parent.clientWidth + 'px';
+        });
     });
     
     // Set default view
@@ -150,8 +185,13 @@ function setActiveView(viewType) {
         mapViewBtn.classList.add('active');
         modelViewBtn.classList.remove('active');
         
-        // Ensure map is properly sized
-        if (mapViewer) mapViewer.resize();
+        // Trigger resize for any iframes
+        const iframes = document.querySelectorAll('iframe');
+        iframes.forEach(iframe => {
+            const parent = iframe.parentElement;
+            iframe.style.height = parent.clientHeight + 'px';
+            iframe.style.width = parent.clientWidth + 'px';
+        });
     } else {
         mapView.classList.remove('active');
         modelView.classList.add('active');
@@ -196,8 +236,15 @@ function toggleFullscreen(element) {
     
     // Resize viewers after fullscreen toggle
     setTimeout(() => {
-        if (mapViewer) mapViewer.resize();
         if (modelViewer) modelViewer.resize();
+        
+        // Also resize any iframes
+        const iframes = document.querySelectorAll('iframe');
+        iframes.forEach(iframe => {
+            const parent = iframe.parentElement;
+            iframe.style.height = parent.clientHeight + 'px';
+            iframe.style.width = parent.clientWidth + 'px';
+        });
     }, 100);
 }
 

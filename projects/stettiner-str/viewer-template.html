@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Name - Drone Mapping Viewer</title>
+    <title>Project Viewer - Drone Mapping</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <!-- Main stylesheets -->
@@ -15,7 +15,7 @@
 <body>
     <header>
         <div class="container">
-            <h1><i class="fas fa-drone"></i> <span id="project-title">Project Name</span></h1>
+            <h1><i class="fas fa-drone"></i> <span id="project-title">Project Viewer</span></h1>
             <div class="header-controls">
                 <div class="view-toggle">
                     <button id="map-view-btn" class="active"><i class="fas fa-map"></i> 2D Map</button>
@@ -70,13 +70,22 @@
                         <!-- Annotations will be added dynamically -->
                     </div>
                 </div>
+                
+                <div class="actions">
+                    <a href="index.html" class="action-button">
+                        <i class="fas fa-external-link-alt"></i> Open Original Map
+                    </a>
+                </div>
             </div>
         </div>
 
         <!-- Main viewer area -->
         <div class="viewer-content">
             <!-- 2D Map View -->
-            <div id="map-view" class="view active"></div>
+            <div id="map-view" class="view active">
+                <!-- We'll embed the original map here via iframe if needed -->
+                <div id="map-container"></div>
+            </div>
             
             <!-- 3D Model View -->
             <div id="model-view" class="view"></div>
@@ -101,31 +110,156 @@
     <script src="../../assets/js/map-viewer.js"></script>
     <script src="../../assets/js/model-viewer.js"></script>
     <script src="../../assets/js/viewer.js"></script>
-
+    
     <script>
-        // Initialize with project data
+        // Initialize the project
         document.addEventListener('DOMContentLoaded', function() {
-            // Load project metadata
+            // Try to load metadata from metadata.json
             fetch('./metadata.json')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('No metadata.json found');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     initializeProject(data);
                 })
                 .catch(error => {
-                    console.error('Error loading project metadata:', error);
-                    // Use default values if metadata file is missing
-                    initializeProject({
-                        title: 'Project Viewer',
-                        date: 'Unknown Date',
-                        location: 'Unknown Location',
-                        description: 'No description available.',
-                        mapSettings: {
-                            center: [0, 0],
-                            zoom: 2
-                        }
-                    });
+                    console.warn('Metadata error:', error);
+                    // Extract metadata from index.html as fallback
+                    extractMetadataFromIndex()
+                        .then(metadata => {
+                            initializeProject(metadata);
+                        })
+                        .catch(err => {
+                            console.error('Failed to extract metadata:', err);
+                            // Use default values as last resort
+                            initializeProject({
+                                title: 'Project Viewer',
+                                date: new Date().toISOString().split('T')[0],
+                                location: 'Unknown Location',
+                                description: 'No description available.',
+                                mapSettings: {
+                                    center: [0, 0],
+                                    zoom: 2
+                                }
+                            });
+                        });
                 });
+                
+            // Set up direct map integration for existing projects
+            setupMapIntegration();
         });
+        
+        // Function to extract metadata from index.html
+        async function extractMetadataFromIndex() {
+            try {
+                const response = await fetch('./index.html');
+                if (!response.ok) {
+                    throw new Error('No index.html found');
+                }
+                
+                const html = await response.text();
+                
+                // Extract title
+                const titleMatch = html.match(/<title>(.*?)<\/title>/i);
+                const title = titleMatch ? titleMatch[1] : 'Project Viewer';
+                
+                // Try to find any map initialization parameters
+                let center = [0, 0];
+                let zoom = 2;
+                
+                // Look for Leaflet initialization
+                const leafletInitMatch = html.match(/L\.map\(['"]\w+['"]\).*?setView\(\[(.*?)\],\s*(\d+)/s);
+                if (leafletInitMatch) {
+                    try {
+                        center = JSON.parse(`[${leafletInitMatch[1]}]`);
+                        zoom = parseInt(leafletInitMatch[2]);
+                    } catch (e) {
+                        console.warn('Failed to parse Leaflet init parameters:', e);
+                    }
+                }
+                
+                // Look for any layer definitions
+                const layers = [];
+                
+                // Base layer (usually first L.tileLayer)
+                const baseTileMatch = html.match(/L\.tileLayer\(['"](.*?)['"],\s*\{(.*?)\}\)/s);
+                if (baseTileMatch) {
+                    layers.push({
+                        id: 'base',
+                        type: 'tile',
+                        name: 'Base Map',
+                        url: baseTileMatch[1],
+                        visible: true,
+                        layerType: 'base'
+                    });
+                }
+                
+                // Look for any overlay layers
+                const overlayMatches = html.match(/L\.tileLayer\(['"](.*?)['"],\s*\{(.*?)\}\)/gs);
+                if (overlayMatches && overlayMatches.length > 1) {
+                    // Skip the first one which is likely the base map
+                    for (let i = 1; i < overlayMatches.length; i++) {
+                        const match = overlayMatches[i];
+                        const urlMatch = match.match(/L\.tileLayer\(['"](.*?)['"]/);
+                        if (urlMatch) {
+                            layers.push({
+                                id: `overlay-${i}`,
+                                type: 'tile',
+                                name: `Overlay ${i}`,
+                                url: urlMatch[1],
+                                visible: true
+                            });
+                        }
+                    }
+                }
+                
+                return {
+                    title: title,
+                    date: new Date().toISOString().split('T')[0],
+                    location: 'Extracted from map',
+                    description: 'Map configuration extracted from index.html',
+                    mapSettings: {
+                        center: center,
+                        zoom: zoom,
+                        layers: layers
+                    },
+                    modelSettings: {
+                        // Try to find any 3D model files in the project directory
+                        modelPath: 'models/terrain.glb', // Default path, might be incorrect
+                        modelType: 'glb'
+                    }
+                };
+            } catch (error) {
+                throw error;
+            }
+        }
+        
+        // Set up integration with existing map
+        function setupMapIntegration() {
+            // We can use two approaches:
+            // 1. Embed the original index.html in an iframe (simplest)
+            // 2. Try to re-implement the map using Leaflet (more complex but better integration)
+            
+            // Approach 1: Iframe embedding
+            const mapContainer = document.getElementById('map-container');
+            const iframe = document.createElement('iframe');
+            iframe.src = './index.html';
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            mapContainer.appendChild(iframe);
+            
+            // Update iframe when resizing
+            window.addEventListener('resize', function() {
+                iframe.style.height = mapContainer.clientHeight + 'px';
+                iframe.style.width = mapContainer.clientWidth + 'px';
+            });
+            
+            // Approach 2 would go here, but requires more complex code to extract map configuration
+        }
     </script>
 </body>
 </html>
