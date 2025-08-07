@@ -172,24 +172,14 @@ function createProjectCard(project) {
     card.className = 'project-card';
     card.setAttribute('data-project-id', project.id);
     
-    // Generate thumbnail URL from map center if available
-    let thumbnailUrl = project.thumbnail;
-    if (!thumbnailUrl && project.mapCenter && Array.isArray(project.mapCenter) && project.mapCenter.length === 2) {
-        // Generate a static map thumbnail using OpenStreetMap/MapBox
-        const [lat, lng] = project.mapCenter;
-        thumbnailUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${lng},${lat},14,0/300x180?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw`;
-        
-        // Alternative using OpenStreetMap static map (if MapBox doesn't work)
-        // thumbnailUrl = `https://maps.geoapify.com/v1/staticmap?style=osm-carto&width=300&height=180&center=lonlat:${lng},${lat}&zoom=14&apiKey=5d486ef4a7124b88a24e1f54c24e97c4`;
-    }
+    // Use a reliable default thumbnail image instead of trying to generate one
+    // This avoids issues with API keys and cross-origin restrictions
+    const defaultThumbnail = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTgwIiB2aWV3Qm94PSIwIDAgMzAwIDE4MCIgZmlsbD0ibm9uZSI+CiAgPHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIxODAiIGZpbGw9IiM3MmI2ZGYiLz4KICA8cGF0aCBkPSJNMCwxMjAgTDUwLDEwMCBMMTAwLDEzMCBMMTUwLDkwIEwyMDAsMTEwIEwyNTAsODAgTDMwMCwxMTAgTDMwMCwxODAgTDAsMTgwIFoiIGZpbGw9IiM1MDk0YzkiLz4KICA8Y2lyY2xlIGN4PSIyNDAiIGN5PSI0MCIgcj0iMjAiIGZpbGw9IiNmZmQ3MDAiLz4KICA8cGF0aCBkPSJNMTUwLDE4MCBMMTM1LDE0MCBMMTM4LDEzNSBMMTQwLDEzNSBMMTQ1LDE0MCBMMTU1LDE0MCBMMTY1LDEzNSBMMTY4LDEzNSBMMTcwLDE0MCBMMTYwLDE4MCBaIiBmaWxsPSIjNDQ0Ii8+CiAgPHBhdGggZD0iTTgwLDE4MCBMNjUsMTUwIEw3MCwxNDUgTDc1LDE0NSBMODAsMTUwIEw4NSwxNTAgTDkwLDE0NSBMOTUsMTQ1IEwxMDAsMTUwIEw5MCwxODAgWiIgZmlsbD0iIzQ0NCIvPgo8L3N2Zz4K';
     
-    const thumbnailStyle = thumbnailUrl 
-        ? `background-image: url(${thumbnailUrl});` 
-        : 'background-color: #ddd; display: flex; justify-content: center; align-items: center;';
+    const thumbnailUrl = project.thumbnail || defaultThumbnail;
     
     card.innerHTML = `
-        <div class="project-image" style="${thumbnailStyle}">
-            ${!thumbnailUrl ? '<i class="fas fa-drone" style="font-size: 3rem; color: #aaa;"></i>' : ''}
+        <div class="project-image" style="background-image: url(${thumbnailUrl}); background-size: cover; background-position: center;">
         </div>
         <div class="project-info">
             <h3>${project.title}</h3>

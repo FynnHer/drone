@@ -18,7 +18,7 @@ function initializeProject(metadata) {
     // Set page title
     document.title = `${metadata.title || 'Project'} - Drone Mapping Viewer`;
     
-    // Initialize 3D model viewer
+    // Initialize 3D model viewer without depending on Draco
     initModelViewer(metadata.modelSettings || {});
     
     // Set up UI event listeners
@@ -38,49 +38,6 @@ function initModelViewer(settings = {}) {
     
     // Initialize the model viewer
     modelViewer = new ModelViewer('model-view', modelSettings);
-    
-    // If no model path was provided, show a helpful message
-    if (!modelSettings.modelPath) {
-        showModelPlaceholder();
-    }
-}
-
-// Show a placeholder message when no 3D model is available
-function showModelPlaceholder() {
-    const modelView = document.getElementById('model-view');
-    if (!modelView) return;
-    
-    // Clear any existing content
-    modelView.innerHTML = '';
-    
-    // Create placeholder element
-    const placeholder = document.createElement('div');
-    placeholder.className = 'model-placeholder';
-    placeholder.style.display = 'flex';
-    placeholder.style.flexDirection = 'column';
-    placeholder.style.justifyContent = 'center';
-    placeholder.style.alignItems = 'center';
-    placeholder.style.height = '100%';
-    placeholder.style.color = '#fff';
-    placeholder.style.textAlign = 'center';
-    placeholder.style.padding = '2rem';
-    
-    placeholder.innerHTML = `
-        <i class="fas fa-cube" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.6;"></i>
-        <h2>No 3D Model Available</h2>
-        <p style="max-width: 600px; margin: 1rem auto;">
-            This project doesn't have a 3D model configured. 
-            To add a 3D model, place a .glb or .obj file in the models directory 
-            and update the metadata.json file.
-        </p>
-        <div style="margin-top: 1rem;">
-            <a href="index.html" class="action-button" style="background-color: #3498db; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; display: inline-block; margin-top: 1rem;">
-                <i class="fas fa-map"></i> View 2D Map Instead
-            </a>
-        </div>
-    `;
-    
-    modelView.appendChild(placeholder);
 }
 
 // Set up UI controls and event listeners

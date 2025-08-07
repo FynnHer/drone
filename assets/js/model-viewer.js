@@ -18,7 +18,6 @@ class ModelViewer {
         this.controls = null;
         this.model = null;
         this.isInitialized = false;
-        this.dracoLoader = null;
         
         // Initialize if container exists
         if (this.container) {
@@ -73,7 +72,11 @@ class ModelViewer {
             
             // Load model if path is provided
             if (this.options.modelPath) {
-                this.loadModel(this.options.modelPath, this.options.modelType);
+                // Try to load as a simple model first
+                this.loadSimpleModel(this.options.modelPath, this.options.modelType);
+            } else {
+                // Create a default cube
+                this.createDefaultCube();
             }
             
             // Start animation loop
@@ -115,7 +118,22 @@ class ModelViewer {
         this.scene.add(gridHelper);
     }
     
-    loadModel(path, type = 'glb') {
+    createDefaultCube() {
+        // Create a simple cube as a placeholder
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshStandardMaterial({ 
+            color: 0x3498db,
+            metalness: 0.2,
+            roughness: 0.7
+        });
+        this.model = new THREE.Mesh(geometry, material);
+        this.scene.add(this.model);
+        
+        // Add animation for the cube
+        this.cubeAnimation = true;
+    }
+    
+    loadSimpleModel(path, type = 'glb') {
         // Clear existing model
         if (this.model) {
             this.scene.remove(this.model);
@@ -125,100 +143,75 @@ class ModelViewer {
         // Show loading indicator
         this.showLoading(true);
         
-        // Check if required loaders are available
-        if (type.toLowerCase() === 'obj' && typeof THREE.OBJLoader === 'undefined') {
-            this.showLoading(false);
-            this.showError('OBJLoader not available. Cannot load OBJ models.');
-            return;
-        }
-        
-        if ((type.toLowerCase() === 'gltf' || type.toLowerCase() === 'glb') && 
-            typeof THREE.GLTFLoader === 'undefined') {
-            this.showLoading(false);
-            this.showError('GLTFLoader not available. Cannot load GLTF/GLB models.');
-            return;
-        }
-        
-        // Setup the appropriate loader
         let loader;
         
-        switch (type.toLowerCase()) {
-            case 'obj':
+        try {
+            // Set up a basic OBJ loader without Draco compression
+            if (type.toLowerCase() === 'obj' && typeof THREE.OBJLoader !== 'undefined') {
                 loader = new THREE.OBJLoader();
-                break;
-            case 'gltf':
-            case 'glb':
-            default:
+            } 
+            // Set up a basic GLTF loader without Draco compression
+            else if ((type.toLowerCase() === 'gltf' || type.toLowerCase() === 'glb') && 
+                     typeof THREE.GLTFLoader !== 'undefined') {
                 loader = new THREE.GLTFLoader();
-                
-                // Setup DRACOLoader for compressed models
-                if (typeof THREE.DRACOLoader !== 'undefined') {
-                    try {
-                        // Create and configure the Draco loader
-                        this.dracoLoader = new THREE.DRACOLoader();
-                        
-                        // Set the path to the Draco decoder
-                        this.dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
-                        
-                        // Optional: Specify a WebAssembly or JavaScript decoder
-                        this.dracoLoader.setDecoderConfig({ type: 'js' });
-                        
-                        // Attach the loader to the GLTFLoader
-                        loader.setDRACOLoader(this.dracoLoader);
-                        
-                        console.log('DRACOLoader configured successfully');
-                    } catch (error) {
-                        console.error('Error configuring DRACOLoader:', error);
-                    }
-                } else {
-                    console.warn('THREE.DRACOLoader not available. Compressed models may not load correctly.');
-                }
-                break;
-        }
-        
-        // Make sure the path is absolute if it's not a URL
-        let modelPath = path;
-        if (!modelPath.startsWith('http') && !modelPath.startsWith('/')) {
-            // If it's a relative path, make sure it's relative to the current page
-            const pageUrl = window.location.href;
-            const baseUrl = pageUrl.substring(0, pageUrl.lastIndexOf('/') + 1);
-            modelPath = new URL(modelPath, baseUrl).href;
-        }
-        
-        // Load the model
-        loader.load(
-            modelPath,
-            (object) => {
-                // Handle different model formats
-                if (type.toLowerCase() === 'gltf' || type.toLowerCase() === 'glb') {
-                    this.model = object.scene;
-                } else {
-                    this.model = object;
-                }
-                
-                // Center model
-                this.centerModel();
-                
-                // Add to scene
-                this.scene.add(this.model);
-                
-                // Hide loading indicator
-                this.showLoading(false);
-            },
-            (xhr) => {
-                // Progress callback
-                if (xhr.lengthComputable) {
-                    const percent = (xhr.loaded / xhr.total * 100).toFixed(0);
-                    this.updateLoadingProgress(percent);
-                }
-            },
-            (error) => {
-                // Error callback
-                console.error('Error loading model:', error);
-                this.showLoading(false);
-                this.showError('Failed to load 3D model: ' + error.message);
+            } else {
+                throw new Error(`Loader for ${type} not available`);
             }
-        );
+            
+            // Make sure the path is absolute if it's not a URL
+            let modelPath = path;
+            if (!modelPath.startsWith('http') && !modelPath.startsWith('/')) {
+                // If it's a relative path, make sure it's relative to the current page
+                const pageUrl = window.location.href;
+                const baseUrl = pageUrl.substring(0, pageUrl.lastIndexOf('/') + 1);
+                modelPath = new URL(modelPath, baseUrl).href;
+            }
+            
+            // Load the model
+            loader.load(
+                modelPath,
+                (object) => {
+                    // Handle different model formats
+                    if (type.toLowerCase() === 'gltf' || type.toLowerCase() === 'glb') {
+                        this.model = object.scene;
+                    } else {
+                        this.model = object;
+                    }
+                    
+                    // Center model
+                    this.centerModel();
+                    
+                    // Add to scene
+                    this.scene.add(this.model);
+                    
+                    // Hide loading indicator
+                    this.showLoading(false);
+                },
+                (xhr) => {
+                    // Progress callback
+                    if (xhr.lengthComputable) {
+                        const percent = (xhr.loaded / xhr.total * 100).toFixed(0);
+                        this.updateLoadingProgress(percent);
+                    }
+                },
+                (error) => {
+                    // Error callback
+                    console.error('Error loading model:', error);
+                    this.showLoading(false);
+                    this.showError('Error loading 3D model: ' + error.message);
+                    
+                    // Fall back to a simple cube
+                    this.createDefaultCube();
+                }
+            );
+        } catch (error) {
+            console.error('Error setting up model loader:', error);
+            this.showLoading(false);
+            this.showError('Error setting up model loader: ' + error.message);
+            
+            // Fall back to a simple cube
+            this.createDefaultCube();
+        }
     }
     
     centerModel() {
@@ -273,6 +266,12 @@ class ModelViewer {
         
         if (this.controls) {
             this.controls.update();
+        }
+        
+        // Animate cube if it's the default model
+        if (this.cubeAnimation && this.model) {
+            this.model.rotation.x += 0.01;
+            this.model.rotation.y += 0.01;
         }
         
         this.render();
@@ -374,12 +373,17 @@ class ModelViewer {
             <div>
                 <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem; color: #f39c12;"></i>
                 <p>${message}</p>
-                <button id="retry-load-model" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    Retry
-                </button>
-                <button id="load-simple-model" style="margin-top: 1rem; margin-left: 0.5rem; padding: 0.5rem 1rem; background: #2ecc71; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    Load Simple Model
-                </button>
+                <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">
+                    The model may use compressed geometry (Draco) or other features not supported by this viewer.
+                </p>
+                <div style="margin-top: 1rem;">
+                    <button id="retry-load-model" style="margin-right: 0.5rem; padding: 0.5rem 1rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Retry
+                    </button>
+                    <button id="load-simple-model" style="padding: 0.5rem 1rem; background: #2ecc71; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Show Demo Model
+                    </button>
+                </div>
             </div>
         `;
         
@@ -389,7 +393,7 @@ class ModelViewer {
             retryButton.addEventListener('click', () => {
                 errorEl.style.display = 'none';
                 if (this.options.modelPath) {
-                    this.loadModel(this.options.modelPath, this.options.modelType);
+                    this.loadSimpleModel(this.options.modelPath, this.options.modelType);
                 }
             });
         }
@@ -399,8 +403,8 @@ class ModelViewer {
         if (simpleModelButton) {
             simpleModelButton.addEventListener('click', () => {
                 errorEl.style.display = 'none';
-                // Load a simple model that doesn't require Draco compression
-                this.loadModel('https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf', 'gltf');
+                // Create a simple cube as a placeholder
+                this.createDefaultCube();
             });
         }
         
