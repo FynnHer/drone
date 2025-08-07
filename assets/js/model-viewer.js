@@ -48,11 +48,9 @@ class ModelViewer {
             this.renderer.shadowMap.enabled = true;
             this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             
-            // Handle different THREE.js versions
-            if (THREE.sRGBEncoding !== undefined) {
-                this.renderer.outputEncoding = THREE.sRGBEncoding;
-            } else if (THREE.OutputEncoding !== undefined) {
-                this.renderer.outputEncoding = THREE.OutputEncoding;
+            // Use modern outputColorSpace instead of deprecated outputEncoding
+            if (this.renderer.outputColorSpace !== undefined) {
+                this.renderer.outputColorSpace = THREE.SRGBColorSpace;
             }
             
             this.updateSize();
@@ -157,17 +155,6 @@ class ModelViewer {
         const gridHelper = new THREE.GridHelper(20, 20, 0x888888, 0x444444);
         gridHelper.position.y = -0.01; // Slightly below origin to avoid z-fighting
         this.scene.add(gridHelper);
-        
-        // Add a directional light helper to see light direction
-        if (this.scene.children.length > 0) {
-            for (let child of this.scene.children) {
-                if (child instanceof THREE.DirectionalLight) {
-                    const helper = new THREE.DirectionalLightHelper(child, 5);
-                    this.scene.add(helper);
-                    break;
-                }
-            }
-        }
     }
     
     createDefaultObjects() {
@@ -283,6 +270,12 @@ class ModelViewer {
                     if (type.toLowerCase() === 'gltf' || type.toLowerCase() === 'glb') {
                         this.model = object.scene;
                         console.log('GLTF/GLB model loaded:', object);
+                        
+                        // Store animations if any
+                        if (object.animations && object.animations.length > 0) {
+                            this.animations = object.animations;
+                            console.log(`Found ${this.animations.length} animations`);
+                        }
                     } else {
                         this.model = object;
                         console.log('OBJ model loaded:', object);
@@ -302,9 +295,17 @@ class ModelViewer {
                                 if (Array.isArray(node.material)) {
                                     node.material.forEach(mat => {
                                         mat.side = THREE.DoubleSide;
+                                        // Make sure materials use the correct color space
+                                        if (mat.map) {
+                                            mat.map.colorSpace = THREE.SRGBColorSpace;
+                                        }
                                     });
                                 } else {
                                     node.material.side = THREE.DoubleSide;
+                                    // Make sure materials use the correct color space
+                                    if (node.material.map) {
+                                        node.material.map.colorSpace = THREE.SRGBColorSpace;
+                                    }
                                 }
                             }
                             console.log('Processed mesh:', node.name);
@@ -377,13 +378,20 @@ class ModelViewer {
             // Create a bounding box
             const boundingBox = new THREE.Box3().setFromObject(this.model);
             
+            // Check if the bounding box is valid (non-zero size)
+            const size = new THREE.Vector3();
+            boundingBox.getSize(size);
+            
+            if (size.x === 0 && size.y === 0 && size.z === 0) {
+                console.warn('Model has zero size bounding box, using default positioning');
+                return;
+            }
+            
             // Get the center of the bounding box
             const center = new THREE.Vector3();
             boundingBox.getCenter(center);
             
             // Get size of the model
-            const size = new THREE.Vector3();
-            boundingBox.getSize(size);
             const maxDim = Math.max(size.x, size.y, size.z);
             
             console.log('Model dimensions:', size);
@@ -403,7 +411,9 @@ class ModelViewer {
             }
             
             // Move model so its center is at the origin
-            this.model.position.sub(center);
+            this.model.position.x = -center.x;
+            this.model.position.y = -center.y;
+            this.model.position.z = -center.z;
             
             // Move model slightly up to ensure it's above the ground
             const minY = boundingBox.min.y;
