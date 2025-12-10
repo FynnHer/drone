@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glossar</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="glossary-header">
+    <h1>Glossar</h1>
+    <a class="button" href="index.html">Zurück zur Startseite</a>
+  </header>
+
+  <main class="glossary-container">
+    <p class="hint">Die Begriffe werden automatisch aus der glossary.txt geladen.</p>
+    <div id="accordion" class="accordion" aria-live="polite"></div>
+    <div id="loading" class="status">Lade Glossar …</div>
+    <div id="error" class="status error" hidden>Glossar konnte nicht geladen werden.</div>
+  </main>
+
+  <script src="glossary.js"></script>
+</body>
+</html>
