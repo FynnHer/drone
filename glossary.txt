@@ -98,3 +98,131 @@ GPS – Global Positioning System
 Das „Global Positioning System“ (die korrekte Bezeichnung lautet Navstar GPS) ist, wie Glonass oder Galileo, ein globales Satelliten-Navigationssystem. Umgangssprachlich werden alle Systeme als „GPS“ bezeichnet.
 GRC – Ground Risk Class
 Risikoklasse Boden
+HALE  – High Altitude Long Endurance
+Große Höhe, lange Reichweite
+ICAO – International Civil Aviation Organisation
+Internationale Zivilluftfahrtorganisation
+IFR – Instrument Flight Rules
+Instrumentenflugregeln
+J – Joule
+Maßeinheit für kinetische Energie
+JARUS – Joint Authorities for Rulemaking on Unmanned Systems
+Internationale Arbeitsgruppe zur Regulierung von Drohnen
+kmz /kml – Keyhole Markup Language
+Eine Datei, die als Layer bspw. in Google Earth geladen werden kann. Die kmz ist eine komprimierte Version der kml.
+Kontrollierter Bereich am Boden
+Ein Bereich am Boden, innerhalb dessen das UAS betrieben wird und der UAS-Betreiber dafür sorgen kann, dass nur beteiligte Personen anwesend sind.
+Kontrollzone
+Eine Kontrollzone ist ein kontrollierter Luftraum (D-CTR), der sich von der Erdoberfläche nach oben bis zu einer festgelegten oberen Begrenzung erstreckt. Die Kontrolle in diesem Luftraum unterliegt einer Flugverkehrskontrollstelle (Tower) an einem Flugplatz.
+LBA – Luftfahrt-Bundesamt
+Das Luftfahrt-Bundesamt mit Sitz in Braunschweig ist die Bundesoberbehörde für alle Aufgaben der zivilen Luftfahrt in Deutschland. Das LBA untersteht der Fach- und Dienstaufsicht des Bundesministeriums für Verkehr und digitale Infrastruktur.
+LiPo – Lithium-Polymer-Akkus
+Akkuart
+LUC – Light UAS Operator Certificate, Betreiberzeugnis für Leicht-UAS
+Ein ausgestelltes Zertifikat für einen UAS-Betreiber, das er von der zuständigen Behörde nach der Europäischen Durchführungsverordnung (EU) 2019/947, Anhang Teil C, erhalten hat.
+Luftfahrzeugführer
+siehe Fernpilot
+Luftraum
+Der Luftraum (Airspace) ist aus der Perspektive der Flugsicherung ein dreidimensionaler Raum, durchwoben von einem Geflecht von Flugstrecken und unterteilt in verschiedene Luftraumklassen, je nach angebotenen Kontrolldienstleistungen.
+Luftraumbeobachter
+Eine Person, die den Fernpiloten unterstützt, indem sie den Luftraum, in dem das unbemannte Luftfahrzeug eingesetzt wird, durch nicht unterstütztes visuelles Scanning auf mögliche Gefahren in der Luft absucht.
+Luftraum G (Golf)
+Der Luftraum G (ausgesprochen: Luftraum Golf) ist der unterste Luftraum in Deutschland. Seine Untergrenze beginnt auf dem Boden und seine Obergrenze liegt im Einklang mit dem darüber liegenden Luftraum E in der Regel bei 2.500 Fuß, sprich 762 Meter. Der Luftraum G ist der einzige unkontrollierte Luftraum in Deutschland. Der Aufstieg einer Drohne bedarf keiner Flugverkehrskontrollfreigabe z. B. durch die DFS. Die Nutzung kann aber durch andere Gesetze und Verordnungen, z. B. hinsichtlich des Naturschutzes, weiter beschränkt werden.
+MALE – Medium Altitude Long Endurance
+Mittlere Höhe, lange Reichweite.
+Menschenansammlungen
+Eine Vielzahl von Menschen, die so dicht gedrängt stehen, dass es einer einzelnen Person nahezu unmöglich ist, sich aus dieser Menge zu entfernen.
+MHz – Megahertz
+Maßeinheit für Funkfrequenz.
+Modellflugzeug
+Ein unbemanntes Luftfahrzeugsystem, das in erster Linie für Freizeitaktivitäten verwendet wird.
+MSL – Mean Sea Level
+(Höhe über dem) Meeresspiegel.
+MTOM – Maximum Take-off Mass, Höchstzulässige Startmasse
+Die vom Hersteller oder Erbauer festgelegte höchstzulässige Masse des unbemannten Luftfahrzeugs, einschließlich Nutzlast und Krafts Synonyme: MTOW, maximale Abflugmasse, maximales Abfluggewicht.
+N/A – Not Applicable
+Nicht verfügbar.
+Nacht
+Die Stunden zwischen dem Ende der bürgerlichen Abenddämmerung und dem Beginn der bürgerlichen Morgendämmerung gemäß der Durchführungsverordnung
+NDB – Non-Directional Beacon
+Ungerichtetes Funkfeuer, Positionsbestimmung in der bemannten Flugnavigation
+NOTAM – Notice to Airmen
+Informationen über temporäre und permanente Änderungen des Luftfahrthandbuches AIP.
+Nutzlast
+Siehe Payload.
+Offene Kategorie – Open Category
+Eine UAS-Betriebskategorie nach Artikel 4 der Durchführungsverordnung (EU) 2019/947
+Payload
+Instrumente, Mechanismen, Ausrüstungen, Teile, Geräte, Zubehörteile oder Zusatzteile einschließlich Kommunikationsausrüstungen, die in das Luftfahrzeug eingebaut bzw. an diesem angebracht sind und nicht dazu verwendet werden oder verwendet werden sollen, das Luftfahrzeug im Flug zu betreiben oder zu steuern, ohne jedoch Teil des Flugwerks, eines Motors oder eines Propellers zu sein.
+PIS – Public Interest Site
+PIS (Public Interest Site) bezeichnet eine Örtlichkeit, die ausschließlich für Flugbetrieb im öffentlichen Interesse genutzt wird – i. d. R. verbunden mit Hubschrauberbetrieb, z. B. an Krankenhäusern.
+Privat hergestelltes UAS
+Ein UAS, das vom Erbauer für seine eigenen Zwecke zusammengebaut oder hergestellt wurde, mit Ausnahme von UAS, die aus Bauteilen zusammengesetzt werden, die als Fertigbausatz in Verkehr gebracht werden.
+PStF - Prüfstelle
+Siehe benannte Stelle.
+RC – Remote Control
+Fernsteuerung
+Redundanz
+Der Ausfall eines Motors kann durch eine Vielzahl anderer Motoren und durch die Flugsteuerungssoftware kompensiert werden.
+RMZ – Radio Mandatory Zone
+Gebiet mit Funkkommunikationspflicht.
+Robustheit
+Die Wirkung der Maßnahmen zur Risikominderung, die sich aus dem Zugewinn an Sicherheit durch diese Maßnahmen und dem Maß an Absicherung und Integrität ergibt, das durch den Zugewinn an Sicherheit erreicht wurde.
+RTH – Return To Home
+Rückkehr zum Startpunkt (Homepoint): Das Gerät kehrt autonom zum Startpunkt zurück.
+SAIL – Specific Assurance Integrity Level
+Risikostufe gem. SORA zur Ermittlung der Gegenmaßnahmen
+SAR – Search And Rescue
+Suchen und Retten
+Schweben
+In der Luft in einer geografischen Position verharren
+SERA – Standardised European Rules of the Air
+Standardisierte Europäische Luftverkehrsregeln
+SMH – Sicherheitsmindesthöhe
+Mindestflughöhe für bemannten Luftverkehr.
+SOP – Standard Operating Procedures
+Standardbetriebsverfahren
+SORA – Specific Operational Risk Assessment
+Die Sora ist eine Methode zur Bestimmung des Boden- und des Luftrisikos, abhängig von der potenziellen/kinetischen Energie einer Drohne und/oder dessen Ausmaße. Darauf basierend ergeben sich Maßnahmen für den Betrieb, welche im Betriebskonzept (ConOps) Berücksichtigung finden.
+SORA-GER – Specific Operational Risk Assessment Germany
+Risikobewertung (deutsche Version)
+Spezielle Kategorie – Specific Category
+Eine UAS-Betriebskategorie nach Artikel 5 der Durchführungsverordnung (EU) 2019/947
+Standardszenario
+Eine UAS-Betriebsart in der Kategorie „speziell“, für die eine genaue Liste von Maßnahmen zur Risikominderung festgelegt wurde und über deren Anwendung bei der Durchführung dieser Betriebsart der Betreiber bei der zuständigen Behörde eine Erklärung abgeben kann.
+Steuerer
+Siehe Fernpilot
+Steuereinheit
+Die Ausrüstung oder das Ausrüstungssystem zur Fernsteuerung unbemannter Luftfahrzeuge im Sinne von Artikel 3 Nummer 32 der Verordnung (EU) 2018/1139, die/das die Kontrolle oder Überwachung des unbemannten Luftfahrzeugs in jeder Flugphase unterstützt, mit Ausnahme von Infrastrukturen, die den Steuerungs- und Kontroll-Linkdienst (C2) unterstützen.
+Tethered
+Gefesselt(e), kabelgebundene, angebundene Drohne
+THW – Bundesanstalt Technisches Hilfswerk
+Behörde im Geschäftsbereich des Bundesinnenministeriums
+Tilt Wing/Tilt Rotor
+Kippflügler: Die Antriebe/Tragflächen lassen sich kippen.
+TMZ –Transponder Mandatory Zone
+Zone mit Transponderpflicht
+TRA – Temporary Reserved Airspace
+Zeitweilig reservierter Luftraum
+UA (Unmanned Aircraft) – Unbemanntes Luftfahrzeug
+Ein Luftfahrzeug, das ohne einen an Bord befindlichen Piloten autonom oder ferngesteuert betrieben wird oder dafür konstruiert ist.
+UAS (Unmanned Aircraft System) – Unbemanntes Luftfahrzeugsystem
+Ein unbemanntes Luftfahrzeug sowie die Ausrüstung für dessen Fernsteuerung. Synonyme: Drohne, UAV, unbemanntes Luftfahrtsystem, unbemanntes Fluggerät, Flugmodell.
+UAS-Betreiber
+Betreiber eines unbemannten Luftfahrzeugsystems: eine juristische oder natürliche Person, die ein oder mehrere UAS betreibt oder zu betreiben gedenkt.
+Unbemanntes Segelflugzeug
+Ein unbemanntes Luftfahrzeug, das durch die dynamische Reaktion der Luft an den festen Auftriebsflächen in der Luft gehalten wird, wobei es im Gleitflug nicht von einem Triebwerk abhängig ist. Es kann für den Notfall mit einem Motor ausgerüstet sein.
+Unbeteiligte Personen
+Personen, die nicht am UAS-Betrieb beteiligt sind oder die die Anweisungen und Sicherheitsvorschriften des UAS-Betreibers nicht kennen.
+U-Space
+Ein U-Space ist ein Luftraumelement für den Einsatz unbemannter Flugobjekte. Der U-Space Airspace ist dabei sowohl mit Blick auf seine maximale Höhe als auch hinsichtlich seiner geografischen Ausdehnung klar vom restlichen Luftraum abgegrenzt. In dem U-Space gibt es klare Organisationsstrukturen und Abläufe, die die einzelnen Drohnenflüge managen (z.B. die An- und Abmeldung einzelner Flüge, die Planung von Flugrouten etc.), und die gleichzeitig dafür sorgt, dass diese sicher ablaufen. Darüber hinaus sorgen sie für eine sichere und reibungslose Interaktion mit dem bemannten Flugverkehr.
+USSP - U-Space Service Provider
+Der U-Space Service Provider koordiniert den unbemannten Flugverkehr im  U-Space und ist für dessen Sicherheit zuständig. Dafür muss er vier  verschiedene technische Services erbringen: Bereitstellung eines vollständigen Luftlagebilds für die Drohnenpiloten (Traffic Information Service) Ständige Kontrolle der Drohnen-Flugbewegungen im jeweiligen U-Space-Gebiet (Network Identification Service) Kontinuierliche Übermittlung relevanter Luftrauminformationen an die Drohnenpiloten (Geo-Awareness Service) Bereitstellung von Dienstleistungen für die Fluganmeldung und  Fluggenehmigung von Drohnenpiloten (Flight Authorisation Service)
+VFR – Visual Flight Rules
+Sichtflugregeln
+VLOS (Visual Line of Sight Operation) – Betrieb in direkter Sicht
+Eine UAS-Betriebsart, bei der der Fernpilot in der Lage ist, einen ununterbrochenen und nicht unterstützten Sichtkontakt mit dem unbemannten Luftfahrzeug aufrechtzuerhalten, sodass er dessen Flugweg so steuern kann, dass Kollisionen mit anderen Luftfahrzeugen, Menschen und Hindernissen vermieden werden.
+VTOL – Vertical Take-Off and Landing
+Senkrechtstart und -Landung
+Zulassungspflichtige Kategorie (Certified Category)
+Eine UAS-Betriebskategorie nach Artikel 6 der Durchführungsverordnung (EU) 2019/947.
