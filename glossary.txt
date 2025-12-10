@@ -1,0 +1,100 @@
+ADS-B – Automatic Dependent Surveillance - Broadcast
+Automatische Übertragung abhängiger Beobachtungsdaten
+AGL – Above Ground Level
+Höhe über Grund
+AIP – Aeronautical Information Publication
+Airspace (Luftraum) ist aus der Perspektive der Flugsicherung ein dreidimensionaler Raum, durchwoben von einem Geflecht von Flugstrecken und unterteilt in verschiedene Luftraumklassen, je nach angebotenen Kontrolldienstleistungen.
+AltMoc – Alternative Means of Compliance
+Alternative Nachweisverfahren
+AMC – Acceptable Means of Compliance
+Akzeptierte Nachweisverfahren
+A-NPA – Advance Notice of Proposed Amendment
+Vorentwurf europäischer Regulierungen
+ARC – Air Risk Class
+Risikoklasse Luft
+ATM – Air Traffic Management
+Air Traffic Management (ATM) ist die zentrale Aufgabe der Flugsicherung. Ziel ist es, den Flugverkehr im zugeteilten Luftraum sicher, flüssig und wirtschaftlich zu organisieren.
+ATTI – Attitude Modus
+Betriebsmodus bei DJI ohne GPS
+ATZ – Aerodrome Traffic Zone
+Flugplatzverkehrszone
+Autonomer Betrieb – Autonomous Operation
+Ein Betrieb, bei dem das unbemannte Luftfahrzeug in Betrieb ist, ohne dass der Fernpilot eingreifen kann.
+BDL – Bundesverband der Deutschen Luftverkehrswirtschaft e. V.
+Der BDL (Bundesverband der Deutschen Luftverkehrswirtschaft e. V.) ist ein Interessenverband der deutschen Luftverkehrswirtschaft.
+Benannte Stelle
+Vom Luftfahrt-Bundesamt benannte Prüfstelle (PStF) zur Durchführung von Theorieprüfungen für Fernpiloten nach UAS.OPEN.030(2)c) in Teil A des Anhangs der DVO (EU) 2019/947.
+Beobachter unbemannter Luftfahrzeuge
+Eine Person, die sich neben dem Fernpiloten befindet und durch nicht unterstützte visuelle Beobachtung des unbemannten Luftfahrzeugs den Fernpiloten dabei unterstützt, das unbemannte Luftfahrzeug im VLOS zu halten und den Flug sicher durchzuführen.
+Bestandsdrohnen
+Drohnen, die in der EU mit CE-Kennzeichnung vor dem 1. Januar 2024 auf den Markt gebracht wurden und der Delegierten Verordnung (EU) 2019/945 nicht genügen (kein C- Klassenidentifizierungskennzeichen)
+BFU – Bundesstelle für Flugunfalluntersuchung
+Nationale Untersuchungsstelle für Unfälle und Störungen in der Zivilluftfahrt.
+BLAG-UAS/FM – Bund-Länder-Arbeitsgruppe UAS und Flugmodelle
+Die Bund-Länder-Arbeitsgruppe (BLAG) für „Unbemannte Luftfahrtsysteme und Flugmodelle“ besteht aus dem Bundesverkehrsministerium (BMVI), den jeweiligen Landesluftfahrtbehörden (LLB) und der DFS Deutsche Flugsicherung GmbH (DFS).
+BMV – Bundesministerium für Verkehr
+Oberste Luftfahrtbehörde für zivile Luftfahrtangelegenheiten
+BOS – Behörden und Organisationen mit Sicherheitsaufgaben
+Einrichtungen, die mit der Abwehr von Gefahren betraut sind, fallen unter den Sammelbegriff Behörden und Organisationen mit Sicherheitsaufgaben (BOS).
+BVLOS – Beyond Visual Line of Sight
+Der Begriff steht für „Beyond Visual Line of Sight“ und bezeichnet den Drohnenbetrieb außerhalb der Sichtweite des Fernpiloten. Für entsprechende Operationen brauchen private und gewerbliche Anwender eine Sondergenehmigung der zuständigen Luftfahrbehörde. Davon ausgenommen sind BOS-Kräfte. Sie sind im Einsatzfall von entsprechenden Auflagen befreit.  
+C2-Link-Dienst
+Der C2-Link, oder Command and Control Link, bezieht sich auf die Kommunikationsverbindung zwischen dem unbemannten Luftfahrzeug (UA) und der Steuereinheit (Control Unit, CU).  Diese Verbindung wird oft von einem Drittanbieter bereitgestellt und ist entscheidend für die Steuerung und Kontrolle des UAs während des Fluges. Der C2-Link gewährleistet, dass der Fernpilot jederzeit die Kontrolle über die Betriebsparameter des UAs hat und ist somit essentiell für die Sicherheit und Effizienz des Fluges. Die EASA betrachtet den C2-Link als einen integralen Bestandteil des sicheren Betriebs unbemannter Luftfahrzeugsysteme (UAS).
+CE-Kennzeichnung
+Eine Kennzeichnung, durch die der Hersteller erklärt, dass das Erzeugnis den geltenden Anforderungen genügt, die in den Harmonisierungsrechtsvorschriften der Union festgelegt sind, nach denen die Anbringung der Kennzeichnung vorgeschrieben ist.
+ConOps – Concept of Operations
+Das Kürzel ConOps steht für „Concept of Operations“, auch „Einsatzbeschreibung oder Betreiberkonzept“ genannt, ist ein Bestandteil der SORA (Specific Operations Risk Assessment) und umfasst u. a. Informationen über die Organisation, die Fernpiloten, das UAS sowie eine kurze Betriebsbeschreibung. Der Umfang des ConOps leitet sich aus der Berechnung der Risikoklassen aus der SORA ab und wird benötigt, sofern eine SORA für den Drohnenflug verlangt wird.
+CTR – Control Zone
+Kontrollzone an Flughäfen
+DAeC – Deutscher Aero Club
+Größter Luftsportverband in Deutschland
+Direkte Fernidentifizierung
+Ein System, das die lokale Übertragung von Informationen über ein im Betrieb befindliches, unbemanntes Luftfahrzeug gewährleistet und auch die Kennzeichnung des unbemannten Luftfahrzeugs umfasst, sodass diese Informationen ohne physischen Zugang zum unbemannten Luftfahrzeug abgerufen werden können.
+DWD – Deutscher Wetterdienst
+Der DWD ist eine in Offenbach am Main sitzende Bundesbehörde. Ihre Hauptaufgabe ist die Überwachung des Klimas in Deutschland sowie die Warnung von wetterbedingten Gefahren. Durch die Bereitstellung von Basiswetterinformationen unterstützt der Deutsche Wetterdienst UAS beider meteorologischen Flugvorbereitung. Die Informationen umfassen u.a. Bodenwindvorhersagen sowie Niederschlagsradar- und Blitzkarten. Für kommerzielle Drohnenbetreiberbietet der DWD zudem ein kostenpflichtiges Selfbriefing-System an. 
+D&A – Detect & Avoid
+Erkennen und Vermeiden. Ein D&A-System erkennt Hindernisse und weicht selbstständig aus.
+EASA – European Aviation Safety Agency
+Europäische Agentur für Flugsicherheit.
+ED-R
+Das Kürzel ED-R steht für ein Flugbeschränkungsgebiet (Restricted Area). Damit ist ein festgelegter Luftraum über dem Hoheitsgebiet eines Staates gemeint, in dem Flüge von Luftfahrzeugen zeitweilig oder dauerhaft Beschränkungen unterliegen. Beispiele hierfür sind Lufträume über Atomkraftwerken oder über dem Berliner Regierungsviertel. Entsprechende Gebiete werden festgelegt, um Gefahren für die öffentliche Sicherheit und Ordnung vorzubeugen. Ob in einem ED-R mit einem UAS eingeflogen werden darf, ist von der Beschränkung abhängig. Ein unerlaubter Einflug ist eine Straftat. 
+EVLOS – Extended Visual Line of Sight
+Betrieb in erweiterter Sichtweite: Entweder sorgen Luftraumbeobachter für eine Luftraumbeobachtung oder übernehmen die Steuerung und sind fortan neue Fernpiloten.
+ft – Feet
+Fuß (Maßeinheit): 1 ft entspricht 0,3048 m
+Fernpilot
+Eine natürliche Person, die für die sichere Durchführung des Fluges eines unbemannten Luftfahrzeugs verantwortlich ist, wobei der Fernpilot entweder die Flugsteuerung manuell vornimmt oder, wenn das unbemannte Luftfahrzeug automatisch fliegt, dessen Kurs überwacht und in der Lage bleibt, jederzeit einzugreifen und den Kurs zu ändern.
+Follow-me-Modus
+Ein Betriebsmodus eines UAS, bei dem das unbemannte Luftfahrzeug dem Fernpiloten innerhalb eines vorher festgelegten Radiusses ständig folgt.
+FLARM®
+Kollisionswarngerät für Luftfahrzeuge
+Flugbuch
+Im Flugbuch dokumentiert der Fernpilot seine Drohnenflüge (elektronisch oder in Papierform). Es enthält u. a. Informationen über Datum und Uhrzeit des Flugs, den Namen des Fernpiloten, die Gesamtdauer des Einsatzes vor Ort sowie die Anzahl der Starts und Landungen. Die Dokumentation ist in Deutschland nicht verpflichtend. Im Rahmen einer Aufstiegserlaubnis oder einer anderen Befreiung von Betriebsverboten kann der Betreiber einer Drohne in den Nebenbestimmungen jedoch dazu verpflichtet werden, ein Flugbuch zu führen.
+Flugmodell
+National: Unbemanntes Luftfahrzeug einschließlich seiner Kontrollstation, welches ausschließlich zu Sport- und Freizeitzwecken betrieben wird
+Flugmodell-Verein oder -Vereinigung
+Eine Organisation mit rechtmäßigem Sitz in einem Mitgliedstaat, die dem Zweck dient, mit UAS Freizeitflüge, Flugveranstaltungen, sportliche Aktivitäten oder Wettbewerbe durchzuführen.
+Flughäfen
+Flughäfen sind Flugplätze, die nach Art und Umfang des vorgesehenen Flugbetriebs einer Sicherung durch einen Bauschutzbereich bedürfen. Die Flughäfen werden genehmigt als Flughäfen des allgemeinen Verkehrs (Verkehrsflughäfen) oder Flughäfen für besondere Zwecke (Sonderflughäfen). Flughäfen sind durch eine Kontrollzone geschützt.
+Flugplätze
+Genehmigte Infrastruktur zum Betrieb von Luftfahrzeugen; Oberbegriff für Flughäfen, Landeplätze und Segelfluggelände
+Flyaway
+Unkontrolliertes Abdriften oder Hinfort-Fliegen einer Drohne
+FPV – First Person View
+Egoperspektive
+Gefährliche Güter
+Von einem unbemannten Luftfahrzeug als Nutzlast mitgeführte Gegenstände oder Stoffe, die bei einem Zwischenfall oder einem Unfall eine Gefahr für die Gesundheit, die Sicherheit, Sachen oder die Umwelt darstellen, insbesondere explosive Stoffe (Gefahr der Massenexplosion, Gefahr durch Splitter, Spreng- und Wurfstücke, geringe Gefahr durch Luftstöße, hohe Brandgefahr, Sprengmittel, extrem unempfindliche Explosivstoffe),Gase (entzündbare Gase, nicht entzündbare Gase, giftige Gase, Sauerstoff, Gefahr beim Einatmen),entzündbare flüssige Stoffe (brennbare Stoffe, Heizöl, Ottokraftstoffe),entzündbare feste Stoffe (selbstentzündliche Feststoffe, gefährlich bei Berührung mit Wasser),entzündend (oxidierend) wirkende Stoffe und organische Peroxide,giftige und ansteckungsgefährliche Stoffe (Gift, Biogefährdung), radioaktive Stoffe, ätzende Stoffe.
+Geofencing
+Virtuell eingerichtete Begrenzung (Einzäunung) mittels GPS
+Geografisches UAS-Gebiet
+Ein von der zuständigen Behörde festgelegter Teil des Luftraums, der den UAS-Betrieb ermöglicht, einschränkt oder ausschließt, um den mit dem UAS-Betrieb verbundenen Risiken für die Sicherheit, den Schutz der Privatsphäre und personenbezogenen Daten, der Sicherheitslage oder der Umwelt Rechnung zu tragen.
+Geo-Sensibilisierung
+Eine Funktion, die ausgehend von den durch die Mitgliedstaaten bereitgestellten Daten eine potenzielle Verletzung der Luftraumgrenzen erkennt und die Fernpiloten warnt, sodass diese sofortige und wirksame Maßnahmen zur Vermeidung dieser Verletzung ergreifen können.
+Gimbal
+Kardanische Aufhängung, mehrachsige Stabilisierungsvorrichtung für die Kamera
+GNSS – Global Navigation Satellite System
+Sammelbegriff für globale Satellitensysteme.
+GPS – Global Positioning System
+Das „Global Positioning System“ (die korrekte Bezeichnung lautet Navstar GPS) ist, wie Glonass oder Galileo, ein globales Satelliten-Navigationssystem. Umgangssprachlich werden alle Systeme als „GPS“ bezeichnet.
+GRC – Ground Risk Class
+Risikoklasse Boden
