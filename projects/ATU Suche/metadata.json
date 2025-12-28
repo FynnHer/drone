@@ -1,10 +1,10 @@
 {
-  "title": "KATU Suche",
+  "title": "ATU Suche",
   "date": "2025-08-06",
-  "location": "DLRG Landau Vereinsheim - Stettiner Straße",
-  "description": "This is a sample drone mapping project showcasing coastline features and terrain.",
+  "location": "Feld in der Nähe von ATU Landau, Deutschland",
+  "description": "Dieses Projekt zeigt eine Drohnenkartierung und 3D-Modellierung eines Feldes in der Nähe von ATU Landau, Deutschland. Die Daten wurden mit einer DJI Phantom 4 Pro Drohne aufgenommen und mit OpenDroneMap verarbeitet, um eine hochauflösende Orthomosaik-Karte und ein detailliertes 3D-Modell zu erstellen. Dieses Projekt dient als Beispiel für die Anwendung von Drohnentechnologie in der Landwirtschaft und Umweltüberwachung.",
   "mapSettings": {
-    "center": [49.203, 8.14],
+    "center": [49.180, 8.09],
     "zoom": 13,
     "minZoom": 10,
     "maxZoom": 19,
