@@ -18,7 +18,7 @@ var lyr_odm_orthophoto_1 = new ol.layer.Image({
         
         
         source: new ol.source.ImageStatic({
-            url: "./layers/odm_orthophoto_1.png",
+            url: "https://cloud.bks-portal.rlp.de/f/22793697",
             attributions: ' ',
             projection: 'EPSG:3857',
             alwaysInRange: true,
