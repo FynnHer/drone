@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet.photon.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet.photon.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:21, minZoom:1
+        }).fitBounds([[49.15627785619603,8.022512812608696],[49.160415747951006,8.03024309015217]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        
+        // ... (Die Popup Funktionen bleiben unverändert, habe sie gekürzt für Übersicht) ...
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        
+        // --- BASE LAYER (Google Hybrid) ---
+        map.createPane('pane_GoogleHybrid_0');
+        map.getPane('pane_GoogleHybrid_0').style.zIndex = 400;
+        var layer_GoogleHybrid_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleHybrid_0',
+            opacity: 1.0,
+            attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
+            minZoom: 1,
+            maxZoom: 21,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        map.addLayer(layer_GoogleHybrid_0);
+
+        // --- DEIN NEUER TILES LAYER (Orthophoto) ---
+        // Hier habe ich den alten ImageOverlay Code entfernt und durch TileLayer ersetzt
+        map.createPane('pane_K4729122025orthophoto_1');
+        map.getPane('pane_K4729122025orthophoto_1').style.zIndex = 401;
+
+        var orthophoto_bounds = [[49.15686633551591,8.023862991492397],[49.15975558909222,8.02859328595551]];
+
+        // WICHTIG: Ersetze 'tiles/{z}/{x}/{y}.png' mit dem echten Pfad zu deinem Qtiles Ordner
+        var layer_K4729122025orthophoto_1 = L.tileLayer('tiles/{z}/{x}/{y}.png', {
+            pane: 'pane_K4729122025orthophoto_1',
+            opacity: 1.0,
+            minZoom: 1,   // Passe dies an die Zoomstufen an, die Qtiles generiert hat (z.B. 15)
+            maxZoom: 21,  // Passe dies an die Zoomstufen an, die Qtiles generiert hat (z.B. 20)
+            tms: false,   // Setze dies auf "true", falls die Kacheln vertauscht/falsch sind
+            transparent: true,
+            bounds: orthophoto_bounds,
+            attribution: 'Orthophoto'
+        });
+        
+        map.addLayer(layer_K4729122025orthophoto_1);
+        
+        // Bounds Group braucht man bei Tiles meist nicht zwingend für das Laden, 
+        // aber es hilft beim "Zoom to Layer" wenn gewünscht.
+        // Da Tiles keine festen Bounds wie ein ImageOverlay zurückgeben, lassen wir das hier leer
+        // oder fügen es manuell hinzu, wenn nötig.
+        
+        setBounds();
+        </script>        
+    </body>
+</html>
