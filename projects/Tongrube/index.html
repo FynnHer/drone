@@ -36,7 +36,7 @@
         <script src="js/leaflet.photon.js"></script>
         <script>
         var map = L.map('map', {
-            zoomControl:false, maxZoom:21, minZoom:1
+            zoomControl:false, maxZoom:21, minZoom:14
         }).fitBounds([[49.15627785619603,8.022512812608696],[49.160415747951006,8.03024309015217]]);
         var hash = new L.Hash(map);
         map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
@@ -58,7 +58,7 @@
             pane: 'pane_GoogleHybrid_0',
             opacity: 1.0,
             attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
-            minZoom: 1,
+            minZoom: 14,
             maxZoom: 21,
             minNativeZoom: 0,
             maxNativeZoom: 20
@@ -76,7 +76,7 @@
         var layer_K4729122025orthophoto_1 = L.tileLayer('./tiles/{z}/{x}/{y}.png', {
             pane: 'pane_K4729122025orthophoto_1',
             opacity: 1.0,
-            minZoom: 1,   // Passe dies an die Zoomstufen an, die Qtiles generiert hat (z.B. 15)
+            minZoom: 14,   // Passe dies an die Zoomstufen an, die Qtiles generiert hat (z.B. 15)
             maxZoom: 21,  // Passe dies an die Zoomstufen an, die Qtiles generiert hat (z.B. 20)
             tms: false,   // Setze dies auf "true", falls die Kacheln vertauscht/falsch sind
             transparent: true,
