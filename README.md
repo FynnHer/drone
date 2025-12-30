@@ -1,5 +1,5 @@
 '''
- // --- DEIN NEUER TILES LAYER (Orthophoto) ---
+
         // Hier habe ich den alten ImageOverlay Code entfernt und durch TileLayer ersetzt
         map.createPane('pane_K4729122025orthophoto_1');
         map.getPane('pane_K4729122025orthophoto_1').style.zIndex = 401;
