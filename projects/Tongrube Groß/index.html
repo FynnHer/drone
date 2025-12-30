@@ -70,8 +70,6 @@
         map.createPane('pane_K4729122025orthophoto_1');
         map.getPane('pane_K4729122025orthophoto_1').style.zIndex = 401;
 
-        var orthophoto_bounds = [[49.15686633551591,8.023862991492397],[49.15975558909222,8.02859328595551]];
-
         // WICHTIG: Ersetze 'tiles/{z}/{x}/{y}.png' mit dem echten Pfad zu deinem Qtiles Ordner
         var layer_K4729122025orthophoto_1 = L.tileLayer('./tiles/{z}/{x}/{y}.png', {
             pane: 'pane_K4729122025orthophoto_1',
@@ -80,7 +78,6 @@
             maxZoom: 20,  // Passe dies an die Zoomstufen an, die Qtiles generiert hat (z.B. 20)
             tms: false,   // Setze dies auf "true", falls die Kacheln vertauscht/falsch sind
             transparent: true,
-            bounds: orthophoto_bounds,
             attribution: 'Orthophoto'
         });
         
