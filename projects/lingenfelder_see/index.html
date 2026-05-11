@@ -58,7 +58,7 @@
             pane: 'pane_GoogleHybrid_0',
             opacity: 1.0,
             attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
-            minZoom: 14,
+            minZoom: 10,
             maxZoom: 21,
             minNativeZoom: 0,
             maxNativeZoom: 20
@@ -70,7 +70,7 @@
         map.createPane('pane_K4729122025orthophoto_1');
         map.getPane('pane_K4729122025orthophoto_1').style.zIndex = 401;
 
-        var orthophoto_bounds = [[49.15686633551591,8.023862991492397],[49.15975558909222,8.02859328595551]];
+        var orthophoto_bounds = [[49.2564104840555004,8.3753319658022392],[49.2623986057845968,8.3881028303763703]];
 
         // WICHTIG: Ersetze 'tiles/{z}/{x}/{y}.png' mit dem echten Pfad zu deinem Qtiles Ordner
         var layer_K4729122025orthophoto_1 = L.tileLayer('./tiles/{z}/{x}/{y}.png', {
